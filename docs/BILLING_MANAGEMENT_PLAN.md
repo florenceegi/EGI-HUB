@@ -16,6 +16,7 @@ per gestire prezzi, piani, provider pagamento e abbonamenti di tutti i progetti
 I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestione.
 
 **Strategia (da `SUPERADMIN_MIGRATION_PLAN.md`)**:
+
 > Non eliminare niente da EGI, creare solo il clone in EGI-HUB.
 > Quando tutto funzionerà come in EGI, lo elimineremo da EGI.
 
@@ -25,37 +26,37 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
 
 ### Tabelle DB già esistenti (in EGI, DB condiviso)
 
-| Tabella | Scopo | Gestita da |
-|---------|-------|------------|
-| `ai_feature_pricing` | Catalogo feature AI: prezzi Egili + EUR | EGI Superadmin (`/superadmin/pricing`) |
-| `platform_settings` | Parametri tecnici: tasso USD/EUR, ratio Egili, soglie | EGI Superadmin (`/superadmin/platform-settings`) |
-| `user_feature_purchases` | Acquisti feature per utente | Solo lettura |
-| `feature_consumption_ledger` | Log consumo feature per utente | Solo lettura |
-| `feature_promotions` | Promozioni e sconti feature | EGI Admin |
-| `recurring_subscriptions` | Abbonamenti ricorrenti utenti EGI | EGI |
-| `egi_living_subscriptions` | Abbonamenti EGI Living | EGI |
-| `orders` | Ordini di acquisto EGI | EGI |
-| `invoices` / `invoice_items` | Fatturazione | EGI |
-| `payment_distributions` | Split ricavi creator/EPP/platform | EGI |
-| `egili_transactions` | Transazioni token Egili | EGI |
-| `wallets` / `wallet_destinations` | Wallet Stripe/PayPal per creator | EGI |
+| Tabella                           | Scopo                                                 | Gestita da                                       |
+| --------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
+| `ai_feature_pricing`              | Catalogo feature AI: prezzi Egili + EUR               | EGI Superadmin (`/superadmin/pricing`)           |
+| `platform_settings`               | Parametri tecnici: tasso USD/EUR, ratio Egili, soglie | EGI Superadmin (`/superadmin/platform-settings`) |
+| `user_feature_purchases`          | Acquisti feature per utente                           | Solo lettura                                     |
+| `feature_consumption_ledger`      | Log consumo feature per utente                        | Solo lettura                                     |
+| `feature_promotions`              | Promozioni e sconti feature                           | EGI Admin                                        |
+| `recurring_subscriptions`         | Abbonamenti ricorrenti utenti EGI                     | EGI                                              |
+| `egi_living_subscriptions`        | Abbonamenti EGI Living                                | EGI                                              |
+| `orders`                          | Ordini di acquisto EGI                                | EGI                                              |
+| `invoices` / `invoice_items`      | Fatturazione                                          | EGI                                              |
+| `payment_distributions`           | Split ricavi creator/EPP/platform                     | EGI                                              |
+| `egili_transactions`              | Transazioni token Egili                               | EGI                                              |
+| `wallets` / `wallet_destinations` | Wallet Stripe/PayPal per creator                      | EGI                                              |
 
 ### Tabelle DB mancanti (da creare in EGI-HUB)
 
-| Tabella | Scopo |
-|---------|-------|
-| `subscription_plans` | Piani abbonamento per NATAN-LOC (Free/Starter/Pro/Enterprise per PA) |
-| `tenant_subscriptions` | Stato abbonamento per ogni tenant NATAN-LOC |
-| `payment_provider_configs` | Config Stripe/PayPal per progetto (API keys, enabled) |
+| Tabella                    | Scopo                                                                |
+| -------------------------- | -------------------------------------------------------------------- |
+| `subscription_plans`       | Piani abbonamento per NATAN-LOC (Free/Starter/Pro/Enterprise per PA) |
+| `tenant_subscriptions`     | Stato abbonamento per ogni tenant NATAN-LOC                          |
+| `payment_provider_configs` | Config Stripe/PayPal per progetto (API keys, enabled)                |
 
 ### Controller EGI-HUB già esistenti (stub/parziali)
 
-| Controller | Path | Stato |
-|-----------|------|-------|
-| `FeaturePricingController` | `Api/Superadmin/FeaturePricingController.php` | ⚠️ STUB — dati hardcoded, non usa DB |
-| `AiCreditsController` | `Api/Superadmin/AiCreditsController.php` | Stato ignoto |
-| `ConsumptionLedgerController` | `Api/Superadmin/ConsumptionLedgerController.php` | Stato ignoto |
-| `PromotionsController` | `Api/Superadmin/PromotionsController.php` | Stato ignoto |
+| Controller                    | Path                                             | Stato                                |
+| ----------------------------- | ------------------------------------------------ | ------------------------------------ |
+| `FeaturePricingController`    | `Api/Superadmin/FeaturePricingController.php`    | ⚠️ STUB — dati hardcoded, non usa DB |
+| `AiCreditsController`         | `Api/Superadmin/AiCreditsController.php`         | Stato ignoto                         |
+| `ConsumptionLedgerController` | `Api/Superadmin/ConsumptionLedgerController.php` | Stato ignoto                         |
+| `PromotionsController`        | `Api/Superadmin/PromotionsController.php`        | Stato ignoto                         |
 
 ---
 
@@ -67,19 +68,11 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
 > sono in DB con `is_active=false` e `cost_fiat_eur=NULL`. La modal di acquisto in EGI
 > non mostra nulla finché non vengono attivati e prezzati da EGI-HUB.
 
-- [ ] **1.1** Verificare endpoint attuale: `GET /api/superadmin/pricing` in EGI-HUB restituisce dati reali o hardcoded
-  - File: `backend/app/Http/Controllers/Api/Superadmin/FeaturePricingController.php`
-  - Attuale: usa `getDefaultPricing()` statico se il model non esiste
-- [ ] **1.2** Creare Model `AiFeaturePricing` in EGI-HUB che punta alla tabella `ai_feature_pricing` del DB condiviso
-  - Path: `backend/app/Models/AiFeaturePricing.php`
-  - Nota: tabella già esistente su DB, basta il model Laravel senza migration
-- [ ] **1.3** Refactor `FeaturePricingController` per usare il model reale
-  - `index()`: lista tutti i record con filtri (categoria, bundle_type, is_active)
-  - `update()`: aggiorna `cost_fiat_eur`, `cost_egili`, `is_active`, `feature_parameters`
-  - `store()`: crea nuovo record
-  - `destroy()`: elimina record (soft delete se possibile)
-- [ ] **1.4** Aggiungere route `store` e `destroy` mancanti in `routes/api.php`
-- [ ] **1.5** Implementare UI React in EGI-HUB-HOME-REACT per Feature Pricing
+- [x] **1.1** ✅ 2026-02-25 — Verificato: stub con `getDefaultPricing()` hardcoded + model `FeaturePricing` inesistente + field names errati (`price_egili`/`enabled` invece di `cost_egili`/`is_active`)
+- [x] **1.2** ✅ 2026-02-25 — Creato `backend/app/Models/AiFeaturePricing.php` — punta a tabella `ai_feature_pricing`, copia fedele del model EGI, nessuna migration
+- [x] **1.3** ✅ 2026-02-25 — Refactor `FeaturePricingController`: CRUD reale con `AiFeaturePricing`. Aggiunto `index()` (filtri: category/bundle_type/is_active/is_bundle), `show()`, `store()`, `update()` parziale, `destroy()` (soft delete). Rimosso stub `getDefaultPricing()`.
+- [x] **1.4** ✅ 2026-02-25 — Aggiunte route `POST pricing` (store), `GET pricing/{id}` (show), `DELETE pricing/{id}` (destroy) in `backend/routes/api.php`. Commit: `6554cc8`
+- [ ] **1.5** 🔄 IN CORSO — Implementare UI React in EGI-HUB-HOME-REACT per Feature Pricing
   - Tabella con filtri (categoria, stato, bundle_type)
   - Toggle attivazione inline
   - Edit prezzi inline (cost_egili, cost_fiat_eur, feature_parameters.egili_amount)
@@ -147,29 +140,32 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
 ## File Chiave da Conoscere
 
 ### EGI-HUB
-| File | Scopo |
-|------|-------|
-| `backend/routes/api.php` | Tutte le route API |
-| `backend/app/Http/Controllers/Api/Superadmin/` | Controller superadmin |
-| `backend/app/Models/` | Models |
-| `backend/database/migrations/` | Migrazioni |
-| `docs/SUPERADMIN_MIGRATION_PLAN.md` | Piano migrazione generale EGI → EGI-HUB |
+
+| File                                           | Scopo                                   |
+| ---------------------------------------------- | --------------------------------------- |
+| `backend/routes/api.php`                       | Tutte le route API                      |
+| `backend/app/Http/Controllers/Api/Superadmin/` | Controller superadmin                   |
+| `backend/app/Models/`                          | Models                                  |
+| `backend/database/migrations/`                 | Migrazioni                              |
+| `docs/SUPERADMIN_MIGRATION_PLAN.md`            | Piano migrazione generale EGI → EGI-HUB |
 
 ### EGI (riferimento)
-| File | Scopo |
-|------|-------|
-| `app/Models/AiFeaturePricing.php` | Model da replicare in EGI-HUB |
-| `app/Models/PlatformSetting.php` | Model da replicare in EGI-HUB |
-| `app/Http/Controllers/Superadmin/SuperadminFeaturePricingController.php` | Controller Blade da sostituire con API |
-| `app/Http/Controllers/Superadmin/SuperadminPlatformSettingsController.php` | Controller Blade da sostituire con API |
-| `database/seeders/AiServicePackagesSeeder.php` | 4 pacchetti AI (starter/professional/business/enterprise) |
-| `database/seeders/PlatformSettingsSeeder.php` | 19 settings gruppo ai_credits |
+
+| File                                                                       | Scopo                                                     |
+| -------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `app/Models/AiFeaturePricing.php`                                          | Model da replicare in EGI-HUB                             |
+| `app/Models/PlatformSetting.php`                                           | Model da replicare in EGI-HUB                             |
+| `app/Http/Controllers/Superadmin/SuperadminFeaturePricingController.php`   | Controller Blade da sostituire con API                    |
+| `app/Http/Controllers/Superadmin/SuperadminPlatformSettingsController.php` | Controller Blade da sostituire con API                    |
+| `database/seeders/AiServicePackagesSeeder.php`                             | 4 pacchetti AI (starter/professional/business/enterprise) |
+| `database/seeders/PlatformSettingsSeeder.php`                              | 19 settings gruppo ai_credits                             |
 
 ---
 
 ## Note Operative
 
 ### Come Partire in una Nuova Sessione
+
 1. Leggere questo file
 2. Controllare lo stato dei checkbox
 3. Identificare il primo `[ ]` non spuntato nella FASE corrente
@@ -180,6 +176,7 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
    ```
 
 ### Comandi Utili EGI-HUB
+
 ```bash
 cd /home/fabio/EGI-HUB/backend && php artisan serve --port=7000   # Laravel API
 cd /home/fabio/EGI-HUB/frontend && npm run dev                    # Frontend :5173
@@ -188,6 +185,7 @@ php artisan migrate                                                # Esegue migr
 ```
 
 ### Regola Deploy
+
 Il DB è condiviso con EGI. Qualsiasi migration va eseguita UNA VOLTA SOLA,
 non su entrambi i progetti. Le migration nuove vanno in EGI-HUB.
 Le migration esistenti (create da EGI) non vanno duplicate.
