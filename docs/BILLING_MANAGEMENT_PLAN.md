@@ -101,11 +101,9 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
 > **Contesto**: ogni progetto ha configurazioni Stripe/PayPal diverse.
 > Oggi sono in `.env` di ogni progetto. Centralizzarle in EGI-HUB.
 
-- [ ] **4.1** Creare migration `payment_provider_configs`
-  - Campi: `project_id`, `provider` (stripe/paypal/crypto), `is_enabled`,
-    `config` (JSON encrypted: api_key, webhook_secret, ecc.), `environment` (sandbox/live)
-- [ ] **4.2** Creare Model + Controller
-- [ ] **4.3** UI React: per ogni progetto, toggle provider + form config
+- [x] **4.1** ✅ 2026-02-25 — Migration `2026_02_25_165222_create_payment_provider_configs_table.php`. Campi: `project_id`, `provider` (stripe/paypal/crypto), `is_enabled`, `config` (text encrypted), `environment` (sandbox/live), `notes`. Eseguita su DB.
+- [x] **4.2** ✅ 2026-02-25 — `PaymentProviderConfig.php` (Model con cast `encrypted:array` per config, `getMaskedConfig()`, `configSchema()` per schema chiavi per provider). `PaymentProviderConfigsController`: `index/store/update/destroy/schema`. 5 route in prefix `billing`.
+- [x] **4.3** ✅ 2026-02-25 — UI `frontend/src/pages/billing/PaymentProviders.tsx`. Vista raggruppata per progetto con card per provider, toggle enabled, modal config con input password (show/hide), merge config (non sovrascrittura completa), warning live environment. Commit: vedi sotto.
 
 ### FASE 5 — Dashboard Economica Aggregata (read-only)
 

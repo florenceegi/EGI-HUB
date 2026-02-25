@@ -45,6 +45,7 @@ use App\Http\Controllers\Api\Superadmin\FeaturedCalendarController;
 use App\Http\Controllers\Api\Superadmin\ConsumptionLedgerController;
 use App\Http\Controllers\Api\Superadmin\PlatformSettingsController;
 use App\Http\Controllers\Api\Superadmin\SubscriptionPlansController;
+use App\Http\Controllers\Api\Superadmin\PaymentProviderConfigsController;
 use App\Http\Controllers\Api\Superadmin\PadminDashboardController;
 use App\Http\Controllers\Api\Superadmin\PadminViolationsController;
 use App\Http\Controllers\Api\Superadmin\PadminSymbolsController;
@@ -197,6 +198,13 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::post('subscriptions', [SubscriptionPlansController::class, 'storeSubscription'])->name('subscriptions.store');
         Route::put('subscriptions/{id}', [SubscriptionPlansController::class, 'updateSubscription'])->name('subscriptions.update');
         Route::delete('subscriptions/{id}', [SubscriptionPlansController::class, 'destroySubscription'])->name('subscriptions.destroy');
+
+        // Payment Provider Configs
+        Route::get('payment-providers', [PaymentProviderConfigsController::class, 'index'])->name('payment-providers.index');
+        Route::post('payment-providers', [PaymentProviderConfigsController::class, 'store'])->name('payment-providers.store');
+        Route::put('payment-providers/{id}', [PaymentProviderConfigsController::class, 'update'])->name('payment-providers.update');
+        Route::delete('payment-providers/{id}', [PaymentProviderConfigsController::class, 'destroy'])->name('payment-providers.destroy');
+        Route::get('payment-providers/schema/{provider}', [PaymentProviderConfigsController::class, 'schema'])->name('payment-providers.schema');
     });
 
     /*
