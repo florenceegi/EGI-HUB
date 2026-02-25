@@ -90,18 +90,11 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
 > **Contesto**: NATAN-LOC serve clienti PA con abbonamento mensile.
 > Non esiste ancora nessuna tabella per i piani NATAN-LOC.
 
-- [ ] **3.1** Definire schema tabella `subscription_plans`
-  - Campi: `id`, `project_id` (FK system_projects), `name`, `slug`, `description`,
-    `price_monthly_eur`, `price_annual_eur`, `max_users`, `max_documents`,
-    `max_queries_monthly`, `features` (JSON), `is_active`, `display_order`
-- [ ] **3.2** Creare migration `subscription_plans` in EGI-HUB
-- [ ] **3.3** Creare migration `tenant_subscriptions` in EGI-HUB
-  - Campi: `id`, `tenant_id` (FK tenants), `plan_id` (FK subscription_plans),
-    `status` (active/trial/suspended/cancelled), `starts_at`, `ends_at`,
-    `trial_ends_at`, `price_paid_eur`, `billing_cycle` (monthly/annual),
-    `stripe_subscription_id`, `paypal_subscription_id`
-- [ ] **3.4** Creare Model + Controller per Plans e Subscriptions
-- [ ] **3.5** UI React: tabella piani + gestione abbonamento per tenant
+- [x] **3.1** ✅ 2026-02-25 — Schema definito: `id`, `project_id` (FK system_projects), `name`, `slug`, `description`, `price_monthly_eur`, `price_annual_eur`, `max_users`, `max_documents`, `max_queries_monthly`, `features` (JSON), `is_active`, `display_order`. SoftDeletes.
+- [x] **3.2** ✅ 2026-02-25 — Migration `2026_02_25_152346_create_subscription_plans_table.php`. Eseguita su DB.
+- [x] **3.3** ✅ 2026-02-25 — Migration `2026_02_25_152346_create_tenant_subscriptions_table.php`. Campi: `tenant_id`, `plan_id`, `status` (active/trial/suspended/cancelled), `starts_at`, `ends_at`, `trial_ends_at`, `price_paid_eur`, `billing_cycle` (monthly/annual/custom), `stripe_subscription_id`, `paypal_subscription_id`. Eseguita su DB.
+- [x] **3.4** ✅ 2026-02-25 — `SubscriptionPlan.php` + `TenantSubscription.php` (Models con scopes e relations). `SubscriptionPlansController`: `index/show/store/update/destroy` per piani + `subscriptions/storeSubscription/updateSubscription/destroySubscription` per tenant subs. 9 route in `billing` prefix.
+- [x] **3.5** ✅ 2026-02-25 — UI `frontend/src/pages/billing/SubscriptionPlans.tsx`. Due tab: "Piani" (CRUD con modal form, toggle is_active, delete con guard abbonati attivi) + "Sottoscrizioni" (tabella con cambio status inline). Commit: `efed113`
 
 ### FASE 4 — Payment Provider Config
 
