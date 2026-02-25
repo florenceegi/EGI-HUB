@@ -28,6 +28,7 @@ import ConsumptionLedger from './pages/platform/ConsumptionLedger'
 import PlatformSettings from './pages/platform/PlatformSettings'
 import SubscriptionPlans from './pages/billing/SubscriptionPlans'
 import PaymentProviders from './pages/billing/PaymentProviders'
+import EconomicDashboard from './pages/billing/EconomicDashboard'
 
 // Padmin Analyzer
 import PadminDashboard from './pages/padmin/Dashboard'
@@ -144,6 +145,7 @@ function AppRoutes() {
         {/* Billing */}
         <Route path="billing/plans" element={<SubscriptionPlans />} />
         <Route path="billing/payment-providers" element={<PaymentProviders />} />
+        <Route path="billing/economics" element={<EconomicDashboard />} />
         
         {/* Padmin Analyzer */}
         <Route path="padmin/dashboard" element={<PadminDashboard />} />

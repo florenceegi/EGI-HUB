@@ -109,10 +109,10 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
 
 > Vista d'insieme sull'economia dell'ecosistema.
 
-- [ ] **5.1** `RevenueAggregationController`: totale ordini per progetto, per periodo
-- [ ] **5.2** `ConsumptionAggregationController`: utilizzo feature per progetto/tenant
-- [ ] **5.3** `EgiliEconomicsController`: Egili in circolazione, conversioni, top-up
-- [ ] **5.4** UI React: dashboard con grafici (Recharts già usato in EGI-HUB-HOME-REACT)
+- [x] **5.1** `RevenueAggregationController`: totale ordini per progetto, per periodo
+- [x] **5.2** `ConsumptionAggregationController`: utilizzo feature per progetto/tenant
+- [x] **5.3** `EgiliEconomicsController`: Egili in circolazione, conversioni, top-up
+- [x] **5.4** UI React: dashboard con grafici (Recharts già usato in EGI-HUB-HOME-REACT)
 
 ---
 

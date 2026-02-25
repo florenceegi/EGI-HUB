@@ -21,15 +21,13 @@ use Illuminate\Routing\Controller;
  * @date 2026-02-25
  * @purpose Espone API JSON per lettura e aggiornamento bulk dei platform settings
  */
-class PlatformSettingsController extends Controller
-{
+class PlatformSettingsController extends Controller {
     /**
      * Lista tutti i setting raggruppati per group.
      *
      * Response: { success, data: { group: [ { id, group, key, value, value_type, label, description, is_editable } ] } }
      */
-    public function index(): JsonResponse
-    {
+    public function index(): JsonResponse {
         try {
             $grouped = PlatformSetting::allGrouped();
 
@@ -53,8 +51,7 @@ class PlatformSettingsController extends Controller
      * Body: { settings: { "<id>": "<value>", ... } }
      * Solo i setting con is_editable=true vengono aggiornati.
      */
-    public function updateGroup(Request $request, string $group): JsonResponse
-    {
+    public function updateGroup(Request $request, string $group): JsonResponse {
         $request->validate([
             'settings'   => 'required|array',
             'settings.*' => 'nullable|string|max:1000',
@@ -90,8 +87,7 @@ class PlatformSettingsController extends Controller
     /**
      * Aggiornamento singolo setting per ID.
      */
-    public function update(Request $request, int $id): JsonResponse
-    {
+    public function update(Request $request, int $id): JsonResponse {
         $request->validate([
             'value' => 'required|string|max:1000',
         ]);

@@ -46,6 +46,9 @@ use App\Http\Controllers\Api\Superadmin\ConsumptionLedgerController;
 use App\Http\Controllers\Api\Superadmin\PlatformSettingsController;
 use App\Http\Controllers\Api\Superadmin\SubscriptionPlansController;
 use App\Http\Controllers\Api\Superadmin\PaymentProviderConfigsController;
+use App\Http\Controllers\Api\Superadmin\RevenueAggregationController;
+use App\Http\Controllers\Api\Superadmin\ConsumptionAggregationController;
+use App\Http\Controllers\Api\Superadmin\EgiliEconomicsController;
 use App\Http\Controllers\Api\Superadmin\PadminDashboardController;
 use App\Http\Controllers\Api\Superadmin\PadminViolationsController;
 use App\Http\Controllers\Api\Superadmin\PadminSymbolsController;
@@ -205,6 +208,17 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::put('payment-providers/{id}', [PaymentProviderConfigsController::class, 'update'])->name('payment-providers.update');
         Route::delete('payment-providers/{id}', [PaymentProviderConfigsController::class, 'destroy'])->name('payment-providers.destroy');
         Route::get('payment-providers/schema/{provider}', [PaymentProviderConfigsController::class, 'schema'])->name('payment-providers.schema');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Analytics / Dashboard Economica (FASE 5 — read-only)
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('analytics')->name('analytics.')->group(function () {
+        Route::get('revenue',     [RevenueAggregationController::class,     'index'])->name('revenue');
+        Route::get('consumption', [ConsumptionAggregationController::class, 'index'])->name('consumption');
+        Route::get('egili',       [EgiliEconomicsController::class,          'index'])->name('egili');
     });
 
     /*
