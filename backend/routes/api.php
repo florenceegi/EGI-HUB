@@ -44,6 +44,7 @@ use App\Http\Controllers\Api\Superadmin\PromotionsController;
 use App\Http\Controllers\Api\Superadmin\FeaturedCalendarController;
 use App\Http\Controllers\Api\Superadmin\ConsumptionLedgerController;
 use App\Http\Controllers\Api\Superadmin\PlatformSettingsController;
+use App\Http\Controllers\Api\Superadmin\SubscriptionPlansController;
 use App\Http\Controllers\Api\Superadmin\PadminDashboardController;
 use App\Http\Controllers\Api\Superadmin\PadminViolationsController;
 use App\Http\Controllers\Api\Superadmin\PadminSymbolsController;
@@ -56,6 +57,7 @@ use App\Http\Controllers\Api\Superadmin\DaemonController;
 | Ecosystem Public Routes (EGI-HUB-HOME)
 |--------------------------------------------------------------------------
 */
+
 Route::prefix('ecosystem')->group(function () {
     Route::get('/', [\App\Http\Controllers\Api\EcosystemController::class, 'index']);
     Route::get('/metrics', [\App\Http\Controllers\Api\EcosystemController::class, 'metrics']);
@@ -93,7 +95,7 @@ Route::middleware('auth:sanctum')->group(function () {
 | Prefix: /api/superadmin
 */
 Route::prefix('superadmin')->name('superadmin.')->group(function () {
-    
+
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('stats', [DashboardController::class, 'stats'])->name('stats');
@@ -107,17 +109,17 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         // Consultations
         Route::get('consultations', [AiConsultationsController::class, 'index'])->name('consultations.index');
         Route::get('consultations/{id}', [AiConsultationsController::class, 'show'])->name('consultations.show');
-        
+
         // Credits
         Route::get('credits', [AiCreditsController::class, 'index'])->name('credits.index');
         Route::post('credits', [AiCreditsController::class, 'store'])->name('credits.store');
         Route::post('credits/{userId}/reset', [AiCreditsController::class, 'reset'])->name('credits.reset');
-        
+
         // Features
         Route::get('features', [AiFeaturesController::class, 'index'])->name('features.index');
         Route::post('features/{slug}/toggle', [AiFeaturesController::class, 'toggle'])->name('features.toggle');
         Route::put('features/{slug}', [AiFeaturesController::class, 'update'])->name('features.update');
-        
+
         // Statistics
         Route::get('statistics', [AiStatisticsController::class, 'index'])->name('statistics');
     });
@@ -132,7 +134,7 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('egili', [EgiliController::class, 'index'])->name('egili.index');
         Route::post('egili/mint', [EgiliController::class, 'mint'])->name('egili.mint');
         Route::post('egili/burn', [EgiliController::class, 'burn'])->name('egili.burn');
-        
+
         // Equilibrium
         Route::get('equilibrium', [EquilibriumController::class, 'index'])->name('equilibrium.index');
         Route::post('equilibrium/recalculate', [EquilibriumController::class, 'recalculate'])->name('equilibrium.recalculate');
@@ -148,25 +150,25 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         Route::get('roles', [RolesController::class, 'index'])->name('roles.index');
         Route::post('roles', [RolesController::class, 'store'])->name('roles.store');
         Route::delete('roles/{id}', [RolesController::class, 'destroy'])->name('roles.destroy');
-        
+
         // Feature Pricing
         Route::get('pricing', [FeaturePricingController::class, 'index'])->name('pricing.index');
         Route::post('pricing', [FeaturePricingController::class, 'store'])->name('pricing.store');
         Route::get('pricing/{id}', [FeaturePricingController::class, 'show'])->name('pricing.show');
         Route::put('pricing/{id}', [FeaturePricingController::class, 'update'])->name('pricing.update');
         Route::delete('pricing/{id}', [FeaturePricingController::class, 'destroy'])->name('pricing.destroy');
-        
+
         // Promotions
         Route::get('promotions', [PromotionsController::class, 'index'])->name('promotions.index');
         Route::post('promotions', [PromotionsController::class, 'store'])->name('promotions.store');
         Route::put('promotions/{id}', [PromotionsController::class, 'update'])->name('promotions.update');
         Route::delete('promotions/{id}', [PromotionsController::class, 'destroy'])->name('promotions.destroy');
-        
+
         // Featured Calendar
         Route::get('featured-calendar', [FeaturedCalendarController::class, 'index'])->name('featured-calendar.index');
         Route::post('featured-calendar', [FeaturedCalendarController::class, 'store'])->name('featured-calendar.store');
         Route::delete('featured-calendar/{id}', [FeaturedCalendarController::class, 'destroy'])->name('featured-calendar.destroy');
-        
+
         // Consumption Ledger
         Route::get('consumption-ledger', [ConsumptionLedgerController::class, 'index'])->name('consumption-ledger.index');
         Route::get('consumption-ledger/export', [ConsumptionLedgerController::class, 'export'])->name('consumption-ledger.export');
@@ -179,6 +181,26 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
 
     /*
     |--------------------------------------------------------------------------
+    | Billing — Subscription Plans & Tenant Subscriptions
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('billing')->name('billing.')->group(function () {
+        // Piani
+        Route::get('plans', [SubscriptionPlansController::class, 'index'])->name('plans.index');
+        Route::post('plans', [SubscriptionPlansController::class, 'store'])->name('plans.store');
+        Route::get('plans/{id}', [SubscriptionPlansController::class, 'show'])->name('plans.show');
+        Route::put('plans/{id}', [SubscriptionPlansController::class, 'update'])->name('plans.update');
+        Route::delete('plans/{id}', [SubscriptionPlansController::class, 'destroy'])->name('plans.destroy');
+
+        // Sottoscrizioni tenant
+        Route::get('subscriptions', [SubscriptionPlansController::class, 'subscriptions'])->name('subscriptions.index');
+        Route::post('subscriptions', [SubscriptionPlansController::class, 'storeSubscription'])->name('subscriptions.store');
+        Route::put('subscriptions/{id}', [SubscriptionPlansController::class, 'updateSubscription'])->name('subscriptions.update');
+        Route::delete('subscriptions/{id}', [SubscriptionPlansController::class, 'destroySubscription'])->name('subscriptions.destroy');
+    });
+
+    /*
+    |--------------------------------------------------------------------------
     | Padmin OS3
     |--------------------------------------------------------------------------
     */
@@ -186,20 +208,20 @@ Route::prefix('superadmin')->name('superadmin.')->group(function () {
         // Dashboard
         Route::get('dashboard', [PadminDashboardController::class, 'index'])->name('dashboard');
         Route::post('scan', [PadminDashboardController::class, 'scan'])->name('scan');
-        
+
         // Violations
         Route::get('violations', [PadminViolationsController::class, 'index'])->name('violations.index');
         Route::put('violations/{id}', [PadminViolationsController::class, 'update'])->name('violations.update');
         Route::post('violations/{id}/autofix', [PadminViolationsController::class, 'autofix'])->name('violations.autofix');
-        
+
         // Symbols
         Route::get('symbols', [PadminSymbolsController::class, 'index'])->name('symbols.index');
         Route::get('symbols/{id}', [PadminSymbolsController::class, 'show'])->name('symbols.show');
         Route::post('symbols/analyze', [PadminSymbolsController::class, 'analyze'])->name('symbols.analyze');
-        
+
         // Search
         Route::get('search', [PadminSearchController::class, 'index'])->name('search');
-        
+
         // Statistics
         Route::get('statistics', [PadminStatisticsController::class, 'index'])->name('statistics');
     });
@@ -234,7 +256,7 @@ Route::prefix('aggregations')->name('aggregations.')->group(function () {
     Route::get('{aggregation}', [AggregationController::class, 'show'])->name('show');
     Route::put('{aggregation}', [AggregationController::class, 'update'])->name('update');
     Route::delete('{aggregation}', [AggregationController::class, 'destroy'])->name('destroy');
-    
+
     // Members management
     Route::post('{aggregation}/invite', [AggregationController::class, 'invite'])->name('invite');
     Route::get('{aggregation}/members', [AggregationController::class, 'members'])->name('members');
@@ -256,18 +278,18 @@ Route::prefix('projects')->name('projects.')->group(function () {
     Route::get('{project}', [ProjectController::class, 'show'])->name('show');
     Route::put('{project}', [ProjectController::class, 'update'])->name('update');
     Route::delete('{project}', [ProjectController::class, 'destroy'])->name('destroy');
-    
+
     // Health checks
     Route::get('{project}/health', [ProjectController::class, 'healthCheck'])->name('health');
     Route::post('health-check-all', [ProjectController::class, 'healthCheckAll'])->name('health-all');
-    
+
     // Service control (Start/Stop)
     Route::post('{project}/start', [ProjectController::class, 'start'])->name('start');
     Route::post('{project}/stop', [ProjectController::class, 'stop'])->name('stop');
-    
+
     // Project activities
     Route::get('{project}/activities', [ProjectActivityController::class, 'forProject'])->name('activities');
-    
+
     // Project Admins management
     Route::get('{slug}/admins', [ProjectAdminController::class, 'index'])->name('admins.index');
     Route::post('{slug}/admins', [ProjectAdminController::class, 'store'])->name('admins.store');
@@ -329,15 +351,15 @@ Route::prefix('tenants')->name('tenants.')->group(function () {
     Route::get('{tenant}', [TenantController::class, 'show'])->name('show');
     Route::put('{tenant}', [TenantController::class, 'update'])->name('update');
     Route::delete('{tenant}', [TenantController::class, 'destroy'])->name('destroy');
-    
+
     // Health checks
     Route::get('{tenant}/health', [TenantController::class, 'healthCheck'])->name('health');
     Route::post('health-check-all', [TenantController::class, 'healthCheckAll'])->name('health-all');
-    
+
     // Service control (Start/Stop)
     Route::post('{tenant}/start', [TenantController::class, 'start'])->name('start');
     Route::post('{tenant}/stop', [TenantController::class, 'stop'])->name('stop');
-    
+
     // Tenant activities
     Route::get('{tenant}/activities', [TenantActivityController::class, 'forTenant'])->name('activities');
 });
@@ -365,7 +387,7 @@ Route::prefix('activities')->name('activities.')->group(function () {
 Route::prefix('proxy')->name('proxy.')->group(function () {
     // Aggregate data from all projects
     Route::get('aggregate', [ProjectProxyController::class, 'aggregate'])->name('aggregate');
-    
+
     // Proxy to specific project
     Route::get('{projectSlug}/{path?}', [ProjectProxyController::class, 'get'])
         ->where('path', '.*')

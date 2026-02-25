@@ -26,6 +26,7 @@ import Promotions from './pages/platform/Promotions'
 import FeaturedCalendar from './pages/platform/FeaturedCalendar'
 import ConsumptionLedger from './pages/platform/ConsumptionLedger'
 import PlatformSettings from './pages/platform/PlatformSettings'
+import SubscriptionPlans from './pages/billing/SubscriptionPlans'
 
 // Padmin Analyzer
 import PadminDashboard from './pages/padmin/Dashboard'
@@ -138,6 +139,9 @@ function AppRoutes() {
         <Route path="platform/featured-calendar" element={<FeaturedCalendar />} />
         <Route path="platform/consumption-ledger" element={<ConsumptionLedger />} />
         <Route path="platform/settings" element={<PlatformSettings />} />
+        
+        {/* Billing */}
+        <Route path="billing/plans" element={<SubscriptionPlans />} />
         
         {/* Padmin Analyzer */}
         <Route path="padmin/dashboard" element={<PadminDashboard />} />
