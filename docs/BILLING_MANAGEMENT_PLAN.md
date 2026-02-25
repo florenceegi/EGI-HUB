@@ -72,7 +72,7 @@ I progetti leggono da EGI-HUB via API. EGI-HUB fornisce le interfacce di gestion
 - [x] **1.2** ✅ 2026-02-25 — Creato `backend/app/Models/AiFeaturePricing.php` — punta a tabella `ai_feature_pricing`, copia fedele del model EGI, nessuna migration
 - [x] **1.3** ✅ 2026-02-25 — Refactor `FeaturePricingController`: CRUD reale con `AiFeaturePricing`. Aggiunto `index()` (filtri: category/bundle_type/is_active/is_bundle), `show()`, `store()`, `update()` parziale, `destroy()` (soft delete). Rimosso stub `getDefaultPricing()`.
 - [x] **1.4** ✅ 2026-02-25 — Aggiunte route `POST pricing` (store), `GET pricing/{id}` (show), `DELETE pricing/{id}` (destroy) in `backend/routes/api.php`. Commit: `6554cc8`
-- [ ] **1.5** 🔄 IN CORSO — Implementare UI React in EGI-HUB-HOME-REACT per Feature Pricing
+- [ ] **1.5** Implementare UI in **EGI-HUB `frontend/`** (Vanilla TS — la console di gestione stile AWS) per Feature Pricing
   - Tabella con filtri (categoria, stato, bundle_type)
   - Toggle attivazione inline
   - Edit prezzi inline (cost_egili, cost_fiat_eur, feature_parameters.egili_amount)
