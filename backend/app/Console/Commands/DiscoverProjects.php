@@ -200,6 +200,7 @@ class DiscoverProjects extends Command
                 $project = Project::updateOrCreate(
                     ['slug' => $sub['slug']],
                     [
+                        'code'              => $sub['slug'],
                         'name'              => $sub['name'],
                         'url'               => $sub['url'],
                         'production_url'    => $sub['production_url'],
