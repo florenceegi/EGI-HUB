@@ -8,16 +8,6 @@ return [
         'project_list_error' => 'Failed to retrieve project list. Params: :query_params. Error: :exception_message',
         'project_creation_error' => 'Failed to create project with slug: :slug. Error: :exception_message',
         'project_update_error' => 'Failed to update project: :project_id. Error: :exception_message',
-    ],
-    'user' => [
-        'consent_update_failed' => 'Non è stato possibile aggiornare le tue preferenze sui consensi. Riprova più tardi.',
-        'gdpr_data_export_failed' => 'Si è verificato un errore durante l\'esportazione dei tuoi dati. Il nostro team è stato notificato.',
-        'generic_error' => 'Si è verificato un errore imprevisto. Riprova più tardi.',
-        'project_list_error' => 'Impossibile caricare la lista dei progetti.',
-        'project_creation_error' => 'Impossibile creare il progetto. Verifica I dati.',
-        'project_update_error' => 'Impossibile aggiornare il progetto.',
-    ]
-];
         'tenant_health_check_failed' => 'Health check failed for tenant :tenant. Error: :error',
         'tenant_sync_failed' => 'Sync failed for tenant :tenant. Error: :error',
         'tenant_action_error' => 'Action :action failed for tenant :tenant. Error: :error',
@@ -30,3 +20,25 @@ return [
         'auth_profile_error' => 'Profile update failed due to system error: :error',
         'gdpr_delete_error' => 'Failed to delete user data (GDPR): :error',
         'consent_history_error' => 'Failed to retrieve consent history: :error',
+    ],
+    'user' => [
+        'consent_update_failed' => 'Non è stato possibile aggiornare le tue preferenze sui consensi. Riprova più tardi.',
+        'gdpr_data_export_failed' => 'Si è verificato un errore durante l\'esportazione dei tuoi dati. Il nostro team è stato notificato.',
+        'generic_error' => 'Si è verificato un errore imprevisto. Riprova più tardi.',
+        'project_list_error' => 'Impossibile caricare la lista dei progetti.',
+        'project_creation_error' => 'Impossibile creare il progetto. Verifica i dati.',
+        'project_update_error' => 'Impossibile aggiornare il progetto.',
+        'tenant_health_check_failed' => 'Health check del progetto non riuscito. Riprova più tardi.',
+        'tenant_sync_failed' => 'Sincronizzazione del progetto non riuscita. Riprova più tardi.',
+        'tenant_action_error' => 'Operazione sul progetto non riuscita. Riprova più tardi.',
+        'tenant_activity_list_error' => 'Impossibile caricare le attività del progetto.',
+        'tenant_stats_error' => 'Impossibile calcolare le statistiche del progetto.',
+        'project_proxy_error' => 'Impossibile raggiungere il progetto. Verifica la connessione.',
+        'project_activity_list_error' => 'Impossibile caricare le attività del progetto.',
+        'auth_login_error' => 'Errore durante il login. Riprova più tardi.',
+        'auth_register_error' => 'Errore durante la registrazione. Riprova più tardi.',
+        'auth_profile_error' => 'Impossibile aggiornare il profilo. Riprova più tardi.',
+        'gdpr_delete_error' => 'Impossibile eliminare i dati. Riprova più tardi.',
+        'consent_history_error' => 'Impossibile caricare la cronologia dei consensi.',
+    ]
+];

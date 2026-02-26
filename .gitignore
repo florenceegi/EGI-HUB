@@ -1,4 +1,5 @@
 vendor/
+!backend/resources/lang/vendor/
 
 # Frontend
 frontend/node_modules/
