@@ -61,6 +61,7 @@ class Project extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'code',
         'name',
         'slug',
         'description',
