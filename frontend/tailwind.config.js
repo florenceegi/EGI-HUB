@@ -6,6 +6,7 @@ export default {
       colors: {
         "egi-primary": "#4F46E5",
         "egi-secondary": "#7C3AED",
+        "purple": "#6D28D9", // violet-700 - WCAG AAA (7.8:1 contrast)
       },
     },
   },
