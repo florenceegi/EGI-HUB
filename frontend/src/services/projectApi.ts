@@ -152,6 +152,17 @@ export async function getAggregatedData<T = unknown>(endpoint: string): Promise<
 }
 
 /**
+ * Run a remote command on the project's EC2 instance via AWS SSM
+ */
+export async function runRemoteCommand(
+  id: number,
+  payload: { command_key?: string; custom_command?: string }
+): Promise<{ success: boolean; output: string; status?: string }> {
+  const response = await api.post(`/projects/${id}/remote-command`, payload);
+  return response.data;
+}
+
+/**
  * Discover projects from Route 53 and upsert in the DB
  */
 export async function discoverProjects(options?: {
@@ -181,6 +192,7 @@ export default {
   proxyToProject,
   getAggregatedData,
   discoverProjects,
+  runRemoteCommand,
 };
 
 // Named export for component usage

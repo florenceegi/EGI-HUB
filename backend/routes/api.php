@@ -312,6 +312,9 @@ Route::prefix('projects')->name('projects.')->group(function () {
     Route::post('{project}/start', [ProjectController::class, 'start'])->name('start');
     Route::post('{project}/stop', [ProjectController::class, 'stop'])->name('stop');
 
+    // Remote command execution via AWS SSM
+    Route::post('{project}/remote-command', [ProjectController::class, 'remoteCommand'])->name('remote-command');
+
     // Project activities
     Route::get('{project}/activities', [ProjectActivityController::class, 'forProject'])->name('activities');
 

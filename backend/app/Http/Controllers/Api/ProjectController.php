@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Services\ProjectService;
+use App\Services\RemoteCommandService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -267,6 +268,44 @@ class ProjectController extends Controller {
             'success' => $result['success'],
             'message' => $result['message'],
             'data' => $result,
+        ], $result['success'] ? 200 : 500);
+    }
+
+    /**
+     * Esegue un comando remoto su EC2 via AWS SSM per il progetto specificato.
+     * Supporta comandi predefiniti (command_key) e comandi arbitrari (custom_command).
+     */
+    public function remoteCommand(Request $request, Project $project): JsonResponse
+    {
+        set_time_limit(300); // deploy_full può richiedere più di 120s
+
+        $validKeys = implode(',', array_keys(RemoteCommandService::PREDEFINED));
+
+        $validated = $request->validate([
+            'command_key'    => "nullable|string|in:{$validKeys}",
+            'custom_command' => 'nullable|string|max:1000',
+        ]);
+
+        if (empty($validated['command_key']) && empty($validated['custom_command'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Specificare command_key oppure custom_command.',
+            ], 422);
+        }
+
+        /** @var RemoteCommandService $service */
+        $service = app(RemoteCommandService::class);
+
+        if (!empty($validated['command_key'])) {
+            $result = $service->runPredefined($project, $validated['command_key']);
+        } else {
+            $result = $service->run($project, $validated['custom_command']);
+        }
+
+        return response()->json([
+            'success' => $result['success'],
+            'output'  => $result['output'],
+            'status'  => $result['status'] ?? null,
         ], $result['success'] ? 200 : 500);
     }
 

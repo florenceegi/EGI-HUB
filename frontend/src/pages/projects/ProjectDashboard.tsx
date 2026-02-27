@@ -1,13 +1,13 @@
 /**
  * Project Admin Dashboard
- * 
+ *
  * Main dashboard for a Project Admin after entering a specific project.
- * Shows project stats, tenant management, and quick actions.
+ * Shows project stats, tenant management, quick actions, and remote deploy commands.
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { 
+import {
   ArrowLeft,
   Users,
   Settings,
@@ -17,9 +17,21 @@ import {
   Server,
   CheckCircle,
   AlertCircle,
-  RefreshCw
+  RefreshCw,
+  Terminal,
+  GitPullRequest,
+  Package,
+  Package2,
+  Hammer,
+  Trash2,
+  Settings2,
+  Database,
+  RefreshCcw,
+  Rocket,
+  Play,
 } from 'lucide-react';
-import { getProjects, checkProjectHealth } from '../../services/projectApi';
+import { getProjects, checkProjectHealth, runRemoteCommand } from '../../services/projectApi';
+import { useToast } from '../../contexts/ToastContext';
 import type { Project } from '../../types/project';
 
 interface DashboardCard {
@@ -30,13 +42,40 @@ interface DashboardCard {
   link?: string;
 }
 
+interface PredefinedCommand {
+  key: string;
+  label: string;
+  icon: React.ReactNode;
+  variant: string;
+}
+
+const PREDEFINED_COMMANDS: PredefinedCommand[] = [
+  { key: 'git_pull',         label: 'Git Pull',         icon: <GitPullRequest className="w-4 h-4" />, variant: 'btn-ghost' },
+  { key: 'composer_install', label: 'Composer Install', icon: <Package className="w-4 h-4" />,        variant: 'btn-ghost' },
+  { key: 'npm_install',      label: 'NPM Install',      icon: <Package2 className="w-4 h-4" />,       variant: 'btn-ghost' },
+  { key: 'npm_build',        label: 'NPM Build',        icon: <Hammer className="w-4 h-4" />,         variant: 'btn-ghost' },
+  { key: 'cache_clear',      label: 'Cache Clear',      icon: <Trash2 className="w-4 h-4" />,         variant: 'btn-ghost' },
+  { key: 'config_cache',     label: 'Config Cache',     icon: <Settings2 className="w-4 h-4" />,      variant: 'btn-ghost' },
+  { key: 'migrate',          label: 'DB Migrate',       icon: <Database className="w-4 h-4" />,       variant: 'btn-ghost' },
+  { key: 'queue_restart',    label: 'Queue Restart',    icon: <RefreshCcw className="w-4 h-4" />,     variant: 'btn-ghost' },
+  { key: 'deploy_full',      label: 'Deploy Completo',  icon: <Rocket className="w-4 h-4" />,         variant: 'btn-primary' },
+];
+
 export default function ProjectDashboard() {
   const { slug } = useParams<{ slug: string }>();
-  
+  const { success: toastSuccess, error: toastError } = useToast();
+
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
   const [healthLoading, setHealthLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Deploy state
+  const [cmdLoading, setCmdLoading] = useState(false);
+  const [cmdOutput, setCmdOutput] = useState<string | null>(null);
+  const [cmdSuccess, setCmdSuccess] = useState<boolean | null>(null);
+  const [cmdLabel, setCmdLabel] = useState<string>('');
+  const [customCommand, setCustomCommand] = useState('');
 
   useEffect(() => {
     if (slug) {
@@ -47,10 +86,9 @@ export default function ProjectDashboard() {
   const loadProject = async () => {
     try {
       setLoading(true);
-      // Get all projects and find by slug
       const projects = await getProjects();
       const found = projects.find(p => p.slug === slug);
-      
+
       if (found) {
         setProject(found);
         setError(null);
@@ -67,7 +105,7 @@ export default function ProjectDashboard() {
 
   const refreshHealth = async () => {
     if (!project) return;
-    
+
     try {
       setHealthLoading(true);
       const response = await checkProjectHealth(project.id);
@@ -76,6 +114,41 @@ export default function ProjectDashboard() {
       console.error('Error checking health:', err);
     } finally {
       setHealthLoading(false);
+    }
+  };
+
+  const handleCommand = async (commandKey?: string) => {
+    if (!project) return;
+
+    const label = commandKey
+      ? (PREDEFINED_COMMANDS.find(c => c.key === commandKey)?.label ?? commandKey)
+      : customCommand;
+
+    setCmdLoading(true);
+    setCmdOutput(null);
+    setCmdSuccess(null);
+    setCmdLabel(label);
+
+    try {
+      const payload = commandKey
+        ? { command_key: commandKey }
+        : { custom_command: customCommand };
+
+      const result = await runRemoteCommand(project.id, payload);
+      setCmdOutput(result.output ?? '(nessun output)');
+      setCmdSuccess(result.success);
+
+      if (result.success) {
+        toastSuccess(`${label}: completato`);
+      } else {
+        toastError(`${label}: terminato con errore`);
+      }
+    } catch (err) {
+      setCmdOutput('Errore di connessione con il server.');
+      setCmdSuccess(false);
+      toastError(`Impossibile eseguire: ${label}`);
+    } finally {
+      setCmdLoading(false);
     }
   };
 
@@ -157,16 +230,15 @@ export default function ProjectDashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Health Status */}
               <div className={`badge ${project.is_healthy ? 'badge-success' : 'badge-error'} gap-1 badge-lg`}>
-                {project.is_healthy 
+                {project.is_healthy
                   ? <CheckCircle className="w-4 h-4" />
                   : <AlertCircle className="w-4 h-4" />
                 }
                 {project.is_healthy ? 'Online' : 'Offline'}
               </div>
 
-              <button 
+              <button
                 className={`btn btn-sm btn-ghost ${healthLoading ? 'loading' : ''}`}
                 onClick={refreshHealth}
                 disabled={healthLoading}
@@ -181,7 +253,6 @@ export default function ProjectDashboard() {
             <p className="mt-4 text-base-content/70">{project.description}</p>
           )}
 
-          {/* Last Health Check */}
           {project.last_health_check && (
             <p className="text-xs text-base-content/50 mt-2">
               Ultimo controllo: {new Date(project.last_health_check).toLocaleString()}
@@ -193,7 +264,7 @@ export default function ProjectDashboard() {
       {/* Quick Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {dashboardCards.map((card, index) => (
-          <Link 
+          <Link
             key={index}
             to={card.link || '#'}
             className="card bg-base-100 shadow hover:shadow-lg transition-shadow"
@@ -285,6 +356,93 @@ export default function ProjectDashboard() {
               </Link>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Deploy & Remote Commands */}
+      <div className="card bg-base-100 shadow-lg">
+        <div className="card-body">
+          <h2 className="card-title">
+            <Terminal className="w-5 h-5" />
+            Deploy &amp; Comandi Remoti
+          </h2>
+          <p className="text-base-content/70 text-sm">
+            Esegui comandi sull'EC2 nella directory del progetto ({project.slug}).
+          </p>
+
+          {/* Predefined command buttons */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {PREDEFINED_COMMANDS.map(cmd => (
+              <button
+                key={cmd.key}
+                className={`btn btn-sm gap-1 ${cmd.variant}`}
+                onClick={() => handleCommand(cmd.key)}
+                disabled={cmdLoading}
+              >
+                {cmdLoading && cmdLabel === cmd.label
+                  ? <span className="loading loading-spinner loading-xs"></span>
+                  : cmd.icon}
+                {cmd.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Custom command */}
+          <div className="mt-4 space-y-2">
+            <label className="label">
+              <span className="label-text font-medium">Comando personalizzato</span>
+            </label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-base-content/40 font-mono text-sm">$</span>
+                <input
+                  type="text"
+                  className="input input-bordered w-full pl-7 font-mono text-sm"
+                  placeholder="es. php artisan tinker --execute='echo 1;'"
+                  value={customCommand}
+                  onChange={e => setCustomCommand(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && customCommand.trim() && !cmdLoading) {
+                      handleCommand();
+                    }
+                  }}
+                  disabled={cmdLoading}
+                />
+              </div>
+              <button
+                className="btn btn-warning gap-1"
+                onClick={() => handleCommand()}
+                disabled={cmdLoading || !customCommand.trim()}
+              >
+                {cmdLoading && !PREDEFINED_COMMANDS.some(c => c.label === cmdLabel)
+                  ? <span className="loading loading-spinner loading-xs"></span>
+                  : <Play className="w-4 h-4" />}
+                Esegui
+              </button>
+            </div>
+          </div>
+
+          {/* Output box */}
+          {cmdLoading && (
+            <div className="mt-4 flex items-center gap-3 text-base-content/60 text-sm">
+              <span className="loading loading-spinner loading-sm"></span>
+              <span>Esecuzione in corso: <span className="font-mono">{cmdLabel}</span> …</span>
+            </div>
+          )}
+
+          {!cmdLoading && cmdOutput !== null && (
+            <div className="mt-4">
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`badge badge-sm ${cmdSuccess ? 'badge-success' : 'badge-error'}`}>
+                  {cmdSuccess ? 'Success' : 'Failed'}
+                </span>
+                <span className="text-sm text-base-content/60 font-mono">{cmdLabel}</span>
+              </div>
+              <pre className="font-mono text-sm bg-neutral text-neutral-content rounded-lg p-4 overflow-auto max-h-64 whitespace-pre-wrap">
+                {cmdOutput || '(nessun output)'}
+              </pre>
+            </div>
+          )}
         </div>
       </div>
     </div>
