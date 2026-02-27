@@ -302,11 +302,12 @@ class ProjectController extends Controller {
             $result = $service->run($project, $validated['custom_command']);
         }
 
+        // Sempre 200: success/failure è nel body, evita che axios lo tratti come errore di rete
         return response()->json([
             'success' => $result['success'],
             'output'  => $result['output'],
             'status'  => $result['status'] ?? null,
-        ], $result['success'] ? 200 : 500);
+        ]);
     }
 
     /**

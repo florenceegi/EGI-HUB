@@ -143,8 +143,12 @@ export default function ProjectDashboard() {
       } else {
         toastError(`${label}: terminato con errore`);
       }
-    } catch (err) {
-      setCmdOutput('Errore di connessione con il server.');
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { data?: { output?: string; message?: string } } };
+      const serverMsg = axiosError.response?.data?.output
+        ?? axiosError.response?.data?.message
+        ?? 'Errore di connessione con il server.';
+      setCmdOutput(serverMsg);
       setCmdSuccess(false);
       toastError(`Impossibile eseguire: ${label}`);
     } finally {
