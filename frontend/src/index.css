@@ -6,11 +6,146 @@
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #213547;
-  background-color: #f5f5f5;
+  color: #0F172A;
+  background-color: #FFFFFF;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+/**
+ * ═════════════════════════════════════════════════════════════════
+ * EGI-HUB Custom Enhancements — Professional Button States
+ * ═════════════════════════════════════════════════════════════════
+ * 
+ * Garantisce transizioni smooth e stati visivamente chiari
+ * senza compromettere i contrasti WCAG.
+ */
+
+/* Button Transitions - Smooth & Professional */
+.btn {
+  @apply transition-all duration-200 ease-in-out;
+  @apply font-medium tracking-tight;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Primary Button - Enhanced States */
+.btn-primary:hover {
+  @apply bg-blue-700;
+}
+
+.btn-primary:active,
+.btn-primary:focus {
+  @apply bg-blue-800 ring-2 ring-blue-300 ring-offset-2;
+}
+
+/* Secondary Button - Enhanced States */
+.btn-secondary:hover {
+  @apply bg-slate-700;
+}
+
+.btn-secondary:active,
+.btn-secondary:focus {
+  @apply bg-slate-800 ring-2 ring-slate-300 ring-offset-2;
+}
+
+/* Accent Button - Enhanced States */
+.btn-accent:hover {
+  @apply bg-teal-700;
+}
+
+.btn-accent:active,
+.btn-accent:focus {
+  @apply bg-teal-800 ring-2 ring-teal-300 ring-offset-2;
+}
+
+/* Error/Danger Button - Enhanced States */
+.btn-error:hover {
+  @apply bg-rose-700;
+}
+
+.btn-error:active,
+.btn-error:focus {
+  @apply bg-rose-800 ring-2 ring-rose-300 ring-offset-2;
+}
+
+/* Success Button - Enhanced States */
+.btn-success:hover {
+  @apply bg-emerald-700;
+}
+
+.btn-success:active,
+.btn-success:focus {
+  @apply bg-emerald-800 ring-2 ring-emerald-300 ring-offset-2;
+}
+
+/* Outline Buttons - Clear Borders & Better Hover */
+.btn-outline {
+  @apply border-2;
+}
+
+.btn-outline:hover {
+  transform: translateY(-1px);
+}
+
+/* Ghost Buttons - Subtle Hover */
+.btn-ghost:hover {
+  @apply bg-slate-100;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Disabled State - Clear Visual Feedback */
+.btn:disabled,
+.btn[disabled] {
+  @apply opacity-50 cursor-not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Focus Visible - Accessibility */
+.btn:focus-visible {
+  @apply outline-none ring-2 ring-offset-2;
+}
+
+/* Link Transitions */
+a {
+  @apply transition-colors duration-150;
+}
+
+/* Card Hover Effects - Subtle */
+.card {
+  @apply transition-shadow duration-200;
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Input Focus - Professional */
+input:focus,
+textarea:focus,
+select:focus {
+  @apply ring-2 ring-blue-500 ring-offset-2 outline-none;
+}
+
+/* Badge Improvements */
+.badge {
+  @apply font-medium tracking-tight;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
