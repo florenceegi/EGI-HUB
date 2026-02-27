@@ -100,7 +100,7 @@ export default {
           
           // Purple - For AI/Analytics features (WCAG AAA compliant)
           "purple": "#6D28D9", // violet-700 (contrast 7.8:1 with white ✓ AAA)
-          "purple-content": "#FFFFFF"
+          "purple-content": "#FFFFFF",
 
           // Error - Rose Red (Errors, Destructive Actions)
           error: "#E11D48", // rose-600
