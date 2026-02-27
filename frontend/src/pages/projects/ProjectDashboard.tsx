@@ -109,12 +109,16 @@ export default function ProjectDashboard() {
         setProject(found);
         setError(null);
 
-        // Usa stack da metadata se disponibile e recente (< 1h)
+        // Usa stack da metadata se disponibile e recente (< 1h).
+        // Invalidiamo se tutti e tre i valori sono false: significa che la detection
+        // era fallita (SSM con regione/IAM errati) e aveva cachato dati sbagliati.
         const cachedStack = (found.metadata as Record<string, unknown>)?.stack as ProjectStack | undefined;
         const cachedAt = (found.metadata as Record<string, unknown>)?.stack_detected_at as string | undefined;
         const isFresh = cachedAt && (Date.now() - new Date(cachedAt).getTime()) < 3600_000;
+        const cacheIsValid = cachedStack &&
+          (cachedStack.has_artisan || cachedStack.has_composer || cachedStack.has_npm);
 
-        if (cachedStack && isFresh) {
+        if (cachedStack && isFresh && cacheIsValid) {
           setStack(cachedStack);
         } else {
           // Rileva stack in background

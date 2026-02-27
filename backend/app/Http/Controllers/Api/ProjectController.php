@@ -328,12 +328,19 @@ class ProjectController extends Controller {
         $service = app(RemoteCommandService::class);
         $stack   = $service->detectStack($project);
 
-        $meta = $project->metadata ?? [];
-        $meta['stack']             = $stack;
-        $meta['stack_detected_at'] = now()->toISOString();
-        $project->update(['metadata' => $meta]);
+        // _detected=false → SSM ha fallito, stiamo restituendo default permissivi.
+        // In questo caso NON salviamo in cache per non inquinare i metadati.
+        $realDetection = $stack['_detected'] ?? true;
+        unset($stack['_detected']); // non esporre flag interno al frontend
 
-        return response()->json(['success' => true, 'data' => $stack, 'cached' => false]);
+        if ($realDetection) {
+            $meta                      = $project->metadata ?? [];
+            $meta['stack']             = $stack;
+            $meta['stack_detected_at'] = now()->toISOString();
+            $project->update(['metadata' => $meta]);
+        }
+
+        return response()->json(['success' => true, 'data' => $stack, 'cached' => false, 'detected' => $realDetection]);
     }
 
     /**

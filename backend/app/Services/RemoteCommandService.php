@@ -99,7 +99,8 @@ class RemoteCommandService
      * Rileva lo stack tecnologico del progetto (artisan, composer, npm)
      * controllando la presenza dei file caratteristici nella deploy_path.
      *
-     * @return array{has_artisan: bool, has_composer: bool, has_npm: bool}
+     * @return array{has_artisan: bool, has_composer: bool, has_npm: bool, _detected: bool}
+     *         _detected=false indica che SSM ha fallito → il caller NON deve cachare il risultato.
      */
     public function detectStack(Project $project): array
     {
@@ -107,17 +108,30 @@ class RemoteCommandService
 
         $result = $this->run($project, $check);
 
-        // Se SSM fallisce del tutto, restituiamo default permissivi
-        if (!$result['success'] && empty(trim($result['output']))) {
-            return ['has_artisan' => true, 'has_composer' => true, 'has_npm' => true];
+        // Se SSM fallisce (qualunque ragione: IAM, regione sbagliata, timeout…)
+        // restituiamo default permissivi senza tentare di interpretare l'output
+        // (che conterrebbe il messaggio di errore, non i token attesi).
+        // _detected=false segnala al controller di NON salvare in cache.
+        if (!$result['success']) {
+            return [
+                'has_artisan'  => true,
+                'has_composer' => true,
+                'has_npm'      => true,
+                '_detected'    => false,
+            ];
         }
 
-        $detected = array_filter(explode(',', trim($result['output'])));
+        // Filtra solo i token riconosciuti: evita di interpretare messaggi di errore
+        // parziali come nomi di stack (es. "Error: command not found" → 0 match).
+        $validTokens = ['artisan', 'composer', 'npm'];
+        $raw         = array_filter(explode(',', trim($result['output'])));
+        $detected    = array_intersect($raw, $validTokens);
 
         return [
             'has_artisan'  => in_array('artisan',  $detected, true),
             'has_composer' => in_array('composer', $detected, true),
             'has_npm'      => in_array('npm',      $detected, true),
+            '_detected'    => true,
         ];
     }
 
