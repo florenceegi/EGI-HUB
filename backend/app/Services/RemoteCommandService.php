@@ -36,8 +36,9 @@ class RemoteCommandService
     {
         $this->ssm = new SsmClient([
             'version' => 'latest',
-            'region'  => env('AWS_DEFAULT_REGION', 'eu-north-1'),
-            // Nessuna chiave: usa automaticamente l'EC2 Instance IAM Role
+            // AWS_EC2_REGION = regione dell'istanza EC2 (eu-north-1)
+            // NON usare AWS_DEFAULT_REGION che punta a us-east-1 per Route53
+            'region'  => env('AWS_EC2_REGION', 'eu-north-1'),
         ]);
     }
 
