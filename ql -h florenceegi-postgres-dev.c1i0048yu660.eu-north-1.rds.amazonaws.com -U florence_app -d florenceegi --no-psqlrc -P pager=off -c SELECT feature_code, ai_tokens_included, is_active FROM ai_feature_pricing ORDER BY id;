@@ -1,0 +1,15 @@
+       feature_code        |           feature_name           | ai_tokens_included | is_active 
+---------------------------+----------------------------------+--------------------+-----------
+ egi_living_subscription   | EGI Living Subscription          |                    | t
+ ai_trait_generation       | Generazione Traits AI            |                    | t
+ ai_description_generation | Generazione Descrizione AI       |                    | t
+ ai_collection_strategy    | Consulenza Strategica Collection |                    | t
+ featured_egi_7d           | Featured EGI - 7 giorni          |                    | t
+ hyper_mode_7d             | Hyper Mode - 7 giorni            |                    | t
+ ai_chat_assistant         | Assistente AI - Art Advisor      |                    | t
+ ai_package_starter        | Starter Pack                     |                    | t
+ ai_package_professional   | Professional Pack                |                    | t
+ ai_package_business       | Business Pack                    |                    | t
+ ai_package_enterprise     | Enterprise Pack                  |                    | t
+(11 rows)
+

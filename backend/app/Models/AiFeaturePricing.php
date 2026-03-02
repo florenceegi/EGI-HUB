@@ -19,8 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @date 2026-02-25
  * @purpose Read-write access alla tabella ai_feature_pricing dal punto di controllo EGI-HUB
  */
-class AiFeaturePricing extends Model
-{
+class AiFeaturePricing extends Model {
     use SoftDeletes;
 
     protected $table = 'ai_feature_pricing';
@@ -88,7 +87,7 @@ class AiFeaturePricing extends Model
         'stackable'              => 'boolean',
         'feature_parameters'     => 'array',
         'benefits'               => 'array',
-        'expected_roi_multiplier'=> 'decimal:2',
+        'expected_roi_multiplier' => 'decimal:2',
         'is_active'              => 'boolean',
         'available_from'         => 'datetime',
         'available_until'        => 'datetime',
@@ -105,28 +104,23 @@ class AiFeaturePricing extends Model
 
     // === SCOPES ===
 
-    public function scopeActive($query)
-    {
+    public function scopeActive($query) {
         return $query->where('is_active', true);
     }
 
-    public function scopeCategory($query, string $category)
-    {
+    public function scopeCategory($query, string $category) {
         return $query->where('feature_category', $category);
     }
 
-    public function scopeBundles($query)
-    {
+    public function scopeBundles($query) {
         return $query->where('is_bundle', true);
     }
 
-    public function scopeCreditPackages($query)
-    {
+    public function scopeCreditPackages($query) {
         return $query->where('bundle_type', 'credit_package');
     }
 
-    public function scopeFeatured($query)
-    {
+    public function scopeFeatured($query) {
         return $query->where('is_featured', true);
     }
 }

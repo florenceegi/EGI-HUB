@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'project.access' => \App\Http\Middleware\ProjectAccess::class,
             'project.permission' => \App\Http\Middleware\ProjectPermission::class,
+            'super.admin' => \App\Http\Middleware\SuperAdminOnly::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

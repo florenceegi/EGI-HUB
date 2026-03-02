@@ -1,0 +1,30 @@
+Success	From github.com:AutobookNft/EGI-HUB
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+    
+   INFO  Configuration cached successfully.  
+
+
+   INFO  Routes cached successfully.  
+
+
+> egi-hub-frontend@1.0.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+✓ 2348 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.45 kB │ gzip:   0.31 kB
+dist/assets/index-BSCUCkJc.css   41.00 kB │ gzip:   6.76 kB
+dist/assets/index-k1E9Gy16.js   948.56 kB │ gzip: 244.30 kB │ map: 3,629.45 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 12.55s
+DEPLOY_OK
+	

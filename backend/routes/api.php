@@ -79,10 +79,10 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated Routes
+| Authenticated Routes (SuperAdmin Only)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'super.admin'])->group(function () {
     // Auth user routes
     Route::prefix('auth')->name('auth.')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
@@ -93,12 +93,20 @@ Route::middleware('auth:sanctum')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Superadmin API Routes
+| Protected Routes - SuperAdmin Only
 |--------------------------------------------------------------------------
-| All routes for the React SuperAdmin frontend.
-| Prefix: /api/superadmin
+| All routes below require authentication and superadmin privileges
 */
-Route::prefix('superadmin')->name('superadmin.')->group(function () {
+Route::middleware(['auth:sanctum', 'super.admin'])->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | Superadmin API Routes
+    |--------------------------------------------------------------------------
+    | All routes for the React SuperAdmin frontend.
+    | Prefix: /api/superadmin
+    */
+    Route::prefix('superadmin')->name('superadmin.')->group(function () {
 
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -436,3 +444,5 @@ Route::prefix('proxy')->name('proxy.')->group(function () {
         ->where('path', '.*')
         ->name('delete');
 });
+
+}); // End of superadmin middleware group
