@@ -445,73 +445,77 @@ export default function FeaturePricing() {
       </div>
     </div>
 
-      {/* MODAL DETTAGLIO — feature_name, benefits, max_egis */}
-      {detailItem && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-lg">
-            <h3 className="mb-4 text-lg font-bold">Modifica dettagli piano</h3>
-            <p className="mb-4 text-sm text-base-content/50 font-mono">{detailItem.feature_code}</p>
+      {/* MODAL DETTAGLIO — feature_name, benefits, max_egis (DaisyUI v5: <dialog>) */}
+      <dialog className="modal" open={!!detailItem}>
+        <div className="modal-box max-w-lg">
+          {detailItem && (
+            <>
+              <h3 className="mb-4 text-lg font-bold">Modifica dettagli piano</h3>
+              <p className="mb-4 text-sm text-base-content/50 font-mono">{detailItem.feature_code}</p>
 
-            <div className="space-y-4">
-              {/* Nome */}
-              <div className="form-control">
-                <label className="label"><span className="label-text font-semibold">Nome piano</span></label>
-                <input
-                  type="text"
-                  className="input input-bordered w-full"
-                  value={detailName}
-                  onChange={e => setDetailName(e.target.value)}
-                />
-              </div>
-
-              {/* max_egis — solo per platform_services */}
-              {detailItem.feature_category === 'platform_services' && (
+              <div className="space-y-4">
+                {/* Nome */}
                 <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold">Max EGI per collezione</span>
-                    <span className="label-text-alt text-base-content/40">vuoto = illimitato</span>
-                  </label>
+                  <label className="label"><span className="label-text font-semibold">Nome piano</span></label>
                   <input
-                    type="number"
-                    min="1"
-                    placeholder="es. 19"
+                    type="text"
                     className="input input-bordered w-full"
-                    value={detailMaxEgis}
-                    onChange={e => setDetailMaxEgis(e.target.value)}
+                    value={detailName}
+                    onChange={e => setDetailName(e.target.value)}
                   />
                 </div>
-              )}
 
-              {/* Benefits */}
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Benefits</span>
-                  <span className="label-text-alt text-base-content/40">una riga per voce</span>
-                </label>
-                <textarea
-                  className="textarea textarea-bordered w-full h-36 font-mono text-sm"
-                  placeholder={"Fino a 19 EGI per collezione\nAnalytics completo\nSupporto prioritario"}
-                  value={detailBenefits}
-                  onChange={e => setDetailBenefits(e.target.value)}
-                />
+                {/* max_egis — solo per platform_services */}
+                {detailItem.feature_category === 'platform_services' && (
+                  <div className="form-control">
+                    <label className="label">
+                      <span className="label-text font-semibold">Max EGI per collezione</span>
+                      <span className="label-text-alt text-base-content/40">vuoto = illimitato</span>
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="es. 19"
+                      className="input input-bordered w-full"
+                      value={detailMaxEgis}
+                      onChange={e => setDetailMaxEgis(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                {/* Benefits */}
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Benefits</span>
+                    <span className="label-text-alt text-base-content/40">una riga per voce</span>
+                  </label>
+                  <textarea
+                    className="textarea textarea-bordered w-full h-36 font-mono text-sm"
+                    placeholder={"Fino a 19 EGI per collezione\nAnalytics completo\nSupporto prioritario"}
+                    value={detailBenefits}
+                    onChange={e => setDetailBenefits(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-            <div className="modal-action">
-              <button className="btn btn-ghost" onClick={() => setDetailItem(null)}>Annulla</button>
-              <button
-                className="btn btn-primary"
-                disabled={detailMutation.isPending || !detailName.trim()}
-                onClick={saveDetail}
-              >
-                {detailMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                Salva
-              </button>
-            </div>
-          </div>
-          <div className="modal-backdrop" onClick={() => setDetailItem(null)} />
+              <div className="modal-action">
+                <button className="btn btn-ghost" onClick={() => setDetailItem(null)}>Annulla</button>
+                <button
+                  className="btn btn-primary"
+                  disabled={detailMutation.isPending || !detailName.trim()}
+                  onClick={saveDetail}
+                >
+                  {detailMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  Salva
+                </button>
+              </div>
+            </>
+          )}
         </div>
-      )}
+        <form method="dialog" className="modal-backdrop">
+          <button onClick={() => setDetailItem(null)}>close</button>
+        </form>
+      </dialog>
     </>
   );
 }
