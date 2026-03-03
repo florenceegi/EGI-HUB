@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Helpers\EarlyEnvironmentHelper;
+use Illuminate\Auth\AuthenticationException;
 
 
 // 🔐 Carica le variabili di ambiente critiche prima del bootstrap
@@ -18,15 +19,25 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // Registra middleware personalizzati per Project Access
+        // Override del middleware auth per evitare route('login') non trovata
+        // In un'app API-only, redirectTo() deve restituire null
         $middleware->alias([
-            'project.access' => \App\Http\Middleware\ProjectAccess::class,
+            'auth'             => \App\Http\Middleware\Authenticate::class,
+            'project.access'   => \App\Http\Middleware\ProjectAccess::class,
             'project.permission' => \App\Http\Middleware\ProjectPermission::class,
-            'super.admin' => \App\Http\Middleware\SuperAdminOnly::class,
-            'ensure.2fa' => \App\Http\Middleware\EnsureTwoFactorPassed::class,
+            'super.admin'      => \App\Http\Middleware\SuperAdminOnly::class,
+            'ensure.2fa'       => \App\Http\Middleware\EnsureTwoFactorPassed::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // API-only: AuthenticationException restituisce sempre JSON 401
+        // senza tentare route('login') che non esiste → evita RouteNotFoundException
+        $exceptions->render(function (AuthenticationException $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+        });
+
         $exceptions->reportable(function (Throwable $e) {
             try {
                 // Tenta di risolvere UEM dal container e tracciare l'errore
