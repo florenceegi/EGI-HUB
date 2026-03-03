@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { DollarSign, Loader2, AlertCircle, Edit2, Check, X, Trash2, ToggleLeft, ToggleRight } from 'lucide-react';
+import { DollarSign, Loader2, AlertCircle, Edit2, Check, X, Trash2, ToggleLeft, ToggleRight, Settings } from 'lucide-react';
 import api from '../../services/api';
 
 // === TYPES — allineati ai campi reali di ai_feature_pricing ===
@@ -19,6 +19,7 @@ interface AiFeaturePricing {
   is_bundle: boolean;
   is_featured: boolean;
   feature_parameters: Record<string, unknown> | null;
+  benefits: string[] | null;
   display_order: number;
   total_purchases: number;
   admin_notes: string | null;
@@ -69,6 +70,12 @@ export default function FeaturePricing() {
     ai_tokens_bonus_percentage: '0',
   });
 
+  // Modal dettaglio (feature_name, benefits, max_egis)
+  const [detailItem, setDetailItem] = useState<AiFeaturePricing | null>(null);
+  const [detailName, setDetailName] = useState('');
+  const [detailBenefits, setDetailBenefits] = useState(''); // una riga per benefit
+  const [detailMaxEgis, setDetailMaxEgis] = useState('');
+
   // === QUERY ===
   const { data, isLoading, error } = useQuery<ApiResponse>({
     queryKey: ['platform-pricing', filterCategory, filterBundleType, filterActive],
@@ -95,6 +102,20 @@ export default function FeaturePricing() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['platform-pricing'] });
       setEditingId(null);
+    },
+  });
+
+  // === MUTATION: update dettaglio (name, benefits, feature_parameters) ===
+  const detailMutation = useMutation({
+    mutationFn: ({ id, feature_name, benefits, feature_parameters }: {
+      id: number;
+      feature_name: string;
+      benefits: string[];
+      feature_parameters: Record<string, unknown>;
+    }) => api.put('/superadmin/platform/pricing/' + id, { feature_name, benefits, feature_parameters }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['platform-pricing'] });
+      setDetailItem(null);
     },
   });
 
@@ -127,6 +148,25 @@ export default function FeaturePricing() {
     updateMutation.mutate({ id, cost_egili: egili, cost_fiat_eur: eur, ai_tokens_included: tokens, ai_tokens_bonus_percentage: isNaN(bonus) ? 0 : bonus });
   };
 
+  const openDetail = (item: AiFeaturePricing) => {
+    setDetailItem(item);
+    setDetailName(item.feature_name);
+    const rawBenefits = item.benefits;
+    setDetailBenefits(Array.isArray(rawBenefits) ? rawBenefits.join('\n') : '');
+    const params = item.feature_parameters ?? {};
+    setDetailMaxEgis(params['max_egis'] != null ? String(params['max_egis']) : '');
+  };
+
+  const saveDetail = () => {
+    if (!detailItem) return;
+    const benefits = detailBenefits.split('\n').map(s => s.trim()).filter(Boolean);
+    const existingParams = detailItem.feature_parameters ?? {};
+    const feature_parameters = detailMaxEgis !== ''
+      ? { ...existingParams, max_egis: parseInt(detailMaxEgis, 10) }
+      : { ...existingParams, max_egis: null };
+    detailMutation.mutate({ id: detailItem.id, feature_name: detailName, benefits, feature_parameters });
+  };
+
   const handleDelete = (item: AiFeaturePricing) => {
     if (!window.confirm('Eliminare "' + item.feature_name + '"?\nQuesta operazione è irreversibile (soft delete).')) return;
     deleteMutation.mutate(item.id);
@@ -157,6 +197,7 @@ export default function FeaturePricing() {
   const items = data?.data ?? [];
 
   return (
+    <>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
@@ -370,6 +411,13 @@ export default function FeaturePricing() {
                             <Edit2 className="w-3 h-3" />
                           </button>
                           <button
+                            className="btn btn-ghost btn-xs text-info"
+                            onClick={() => openDetail(item)}
+                            title="Modifica nome/benefits/max_egis"
+                          >
+                            <Settings className="w-3 h-3" />
+                          </button>
+                          <button
                             className="btn btn-ghost btn-xs text-error"
                             disabled={deleteMutation.isPending}
                             onClick={() => handleDelete(item)}
@@ -396,5 +444,74 @@ export default function FeaturePricing() {
         </div>
       </div>
     </div>
+
+      {/* MODAL DETTAGLIO — feature_name, benefits, max_egis */}
+      {detailItem && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-lg">
+            <h3 className="mb-4 text-lg font-bold">Modifica dettagli piano</h3>
+            <p className="mb-4 text-sm text-base-content/50 font-mono">{detailItem.feature_code}</p>
+
+            <div className="space-y-4">
+              {/* Nome */}
+              <div className="form-control">
+                <label className="label"><span className="label-text font-semibold">Nome piano</span></label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={detailName}
+                  onChange={e => setDetailName(e.target.value)}
+                />
+              </div>
+
+              {/* max_egis — solo per platform_services */}
+              {detailItem.feature_category === 'platform_services' && (
+                <div className="form-control">
+                  <label className="label">
+                    <span className="label-text font-semibold">Max EGI per collezione</span>
+                    <span className="label-text-alt text-base-content/40">vuoto = illimitato</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="es. 19"
+                    className="input input-bordered w-full"
+                    value={detailMaxEgis}
+                    onChange={e => setDetailMaxEgis(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {/* Benefits */}
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Benefits</span>
+                  <span className="label-text-alt text-base-content/40">una riga per voce</span>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered w-full h-36 font-mono text-sm"
+                  placeholder={"Fino a 19 EGI per collezione\nAnalytics completo\nSupporto prioritario"}
+                  value={detailBenefits}
+                  onChange={e => setDetailBenefits(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="modal-action">
+              <button className="btn btn-ghost" onClick={() => setDetailItem(null)}>Annulla</button>
+              <button
+                className="btn btn-primary"
+                disabled={detailMutation.isPending || !detailName.trim()}
+                onClick={saveDetail}
+              >
+                {detailMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                Salva
+              </button>
+            </div>
+          </div>
+          <div className="modal-backdrop" onClick={() => setDetailItem(null)} />
+        </div>
+      )}
+    </>
   );
 }
