@@ -458,7 +458,10 @@ export default function FeaturePricing() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-bold">Modifica dettagli piano</h3>
-                <p className="text-xs font-mono mt-1" style={{ color: '#6b7280' }}>{detailItem.feature_code}</p>
+                <p className="text-xs font-mono mt-1" style={{ color: '#6b7280' }}>
+                  <span className="font-sans not-italic" style={{ color: '#9ca3af' }}>Codice interno: </span>
+                  {detailItem.feature_code}
+                </p>
               </div>
               <button
                 className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
