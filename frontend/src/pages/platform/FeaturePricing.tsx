@@ -452,15 +452,18 @@ export default function FeaturePricing() {
           <div className="absolute inset-0 bg-black/60" onClick={() => setDetailItem(null)} />
 
           {/* Box */}
-          <div className="relative z-10 w-full max-w-lg rounded-2xl bg-base-100 shadow-2xl p-6 flex flex-col gap-5">
+          <div className="relative z-10 w-full max-w-lg rounded-2xl shadow-2xl p-6 flex flex-col gap-5" style={{ backgroundColor: '#ffffff', color: '#111827' }}>
 
             {/* Header */}
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-bold">Modifica dettagli piano</h3>
-                <p className="text-xs text-base-content/40 font-mono mt-1">{detailItem.feature_code}</p>
+                <p className="text-xs font-mono mt-1" style={{ color: '#6b7280' }}>{detailItem.feature_code}</p>
               </div>
-              <button className="btn btn-ghost btn-sm btn-circle" onClick={() => setDetailItem(null)}>
+              <button
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100"
+                style={{ color: '#6b7280' }}
+                onClick={() => setDetailItem(null)}>
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -472,7 +475,8 @@ export default function FeaturePricing() {
                 <label className="text-sm font-semibold">Nome piano</label>
                 <input
                   type="text"
-                  className="input input-bordered w-full"
+                    className="w-full rounded-lg px-3 py-2 text-sm"
+                    style={{ border: '1px solid #d1d5db', backgroundColor: '#f9fafb', color: '#111827' }}
                   value={detailName}
                   onChange={e => setDetailName(e.target.value)}
                 />
@@ -483,16 +487,17 @@ export default function FeaturePricing() {
                 <div className="flex flex-col gap-1">
                   <div className="flex items-baseline justify-between">
                     <label className="text-sm font-semibold">Max EGI per collezione</label>
-                    <span className="text-xs text-base-content/40">vuoto = illimitato</span>
+                    <span className="text-xs" style={{ color: '#9ca3af' }}>vuoto = illimitato</span>
                   </div>
                   <input
-                    type="number"
-                    min="1"
-                    placeholder="es. 19"
-                    className="input input-bordered w-full"
-                    value={detailMaxEgis}
-                    onChange={e => setDetailMaxEgis(e.target.value)}
-                  />
+                      type="number"
+                      min="1"
+                      placeholder="es. 19"
+                      className="w-full rounded-lg px-3 py-2 text-sm"
+                      style={{ border: '1px solid #d1d5db', backgroundColor: '#f9fafb', color: '#111827' }}
+                      value={detailMaxEgis}
+                      onChange={e => setDetailMaxEgis(e.target.value)}
+                    />
                 </div>
               )}
 
@@ -500,11 +505,12 @@ export default function FeaturePricing() {
               <div className="flex flex-col gap-1">
                 <div className="flex items-baseline justify-between">
                   <label className="text-sm font-semibold">Benefits</label>
-                  <span className="text-xs text-base-content/40">una riga per voce</span>
+                    <span className="text-xs" style={{ color: '#9ca3af' }}>una riga per voce</span>
                 </div>
                 <textarea
                   rows={6}
-                  className="textarea textarea-bordered w-full font-mono text-sm resize-y"
+                  className="w-full rounded-lg px-3 py-2 font-mono text-sm resize-y"
+                  style={{ border: '1px solid #d1d5db', backgroundColor: '#f9fafb', color: '#111827' }}
                   placeholder={"Fino a 19 EGI per collezione\nAnalytics completo\nSupporto prioritario"}
                   value={detailBenefits}
                   onChange={e => setDetailBenefits(e.target.value)}
@@ -513,8 +519,11 @@ export default function FeaturePricing() {
             </div>
 
             {/* Azioni */}
-            <div className="flex justify-end gap-2 pt-2 border-t border-base-200">
-              <button className="btn btn-ghost" onClick={() => setDetailItem(null)}>Annulla</button>
+            <div className="flex justify-end gap-2 pt-2" style={{ borderTop: '1px solid #e5e7eb' }}>
+              <button
+                className="px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100"
+                style={{ color: '#374151' }}
+                onClick={() => setDetailItem(null)}>Annulla</button>
               <button
                 className="btn btn-primary"
                 disabled={detailMutation.isPending || !detailName.trim()}
