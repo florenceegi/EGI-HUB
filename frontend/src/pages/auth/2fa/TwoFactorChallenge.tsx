@@ -63,9 +63,8 @@ export default function TwoFactorChallenge() {
         // getMe fallisce raramente qui, ma non blocchiamo il flusso
       }
 
-      // Naviga all'app principale
-      navigate('/my-projects', { replace: true });
-      navigate('/my-projects', { replace: true });
+      // Naviga alla dashboard principale
+      navigate('/', { replace: true });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Codice 2FA non valido.');
     } finally {

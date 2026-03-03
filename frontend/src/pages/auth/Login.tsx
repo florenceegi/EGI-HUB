@@ -28,11 +28,11 @@ export default function Login() {
       const response = await authApi.login(email, password);
       login(response.data.user, response.data.token);
 
-      // Gestione 2FA (Se true mandalo alla challenge, altrimenti dashboard normale)
+      // Gestione 2FA: se richiesta vai alla challenge, altrimenti dashboard
       if (response.data.requires_2fa) {
         navigate('/2fa-challenge');
       } else {
-        navigate('/my-projects');
+        navigate('/');
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Errore durante il login');

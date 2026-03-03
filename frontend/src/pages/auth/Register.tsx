@@ -43,7 +43,7 @@ export default function Register() {
     try {
       const response = await authApi.register(name, email, password, passwordConfirmation);
       login(response.data.user, response.data.token);
-      navigate('/my-projects');
+      navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Errore durante la registrazione');
     } finally {
