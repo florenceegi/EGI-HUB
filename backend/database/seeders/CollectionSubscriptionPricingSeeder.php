@@ -51,9 +51,9 @@ class CollectionSubscriptionPricingSeeder extends Seeder {
                 'egili_required_for_discount' => 0,
             ],
             'benefits' => [
-                'max_egis'          => 19,
-                'full_analytics'    => true,
-                'priority_support'  => true,
+                'Fino a 19 EGI per collezione',
+                'Analytics completo',
+                'Supporto prioritario',
             ],
         ],
         [
@@ -77,9 +77,9 @@ class CollectionSubscriptionPricingSeeder extends Seeder {
                 'egili_required_for_discount' => 0,
             ],
             'benefits' => [
-                'max_egis'          => 49,
-                'full_analytics'    => true,
-                'priority_support'  => true,
+                'Fino a 49 EGI per collezione',
+                'Analytics completo',
+                'Supporto prioritario',
             ],
         ],
         [
@@ -103,9 +103,9 @@ class CollectionSubscriptionPricingSeeder extends Seeder {
                 'egili_required_for_discount' => 0,
             ],
             'benefits' => [
-                'max_egis'          => 99,
-                'full_analytics'    => true,
-                'priority_support'  => true,
+                'Fino a 99 EGI per collezione',
+                'Analytics completo',
+                'Supporto prioritario',
             ],
         ],
         [
@@ -129,9 +129,9 @@ class CollectionSubscriptionPricingSeeder extends Seeder {
                 'egili_required_for_discount' => 0,
             ],
             'benefits' => [
-                'max_egis'          => null,
-                'full_analytics'    => true,
-                'priority_support'  => true,
+                'EGI illimitati per collezione',
+                'Analytics completo',
+                'Supporto prioritario',
             ],
         ],
     ];

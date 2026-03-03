@@ -152,7 +152,15 @@ export default function FeaturePricing() {
     setDetailItem(item);
     setDetailName(item.feature_name);
     const rawBenefits = item.benefits;
-    setDetailBenefits(Array.isArray(rawBenefits) ? rawBenefits.join('\n') : '');
+    if (Array.isArray(rawBenefits)) {
+      // Array di stringhe → join (formato corretto)
+      setDetailBenefits((rawBenefits as unknown[]).filter(v => typeof v === 'string').join('\n'));
+    } else if (rawBenefits && typeof rawBenefits === 'object') {
+      // Oggetto associativo (formato legacy) → mostra come JSON per editing
+      setDetailBenefits(Object.entries(rawBenefits).map(([k, v]) => `${k}: ${v}`).join('\n'));
+    } else {
+      setDetailBenefits('');
+    }
     const params = item.feature_parameters ?? {};
     setDetailMaxEgis(params['max_egis'] != null ? String(params['max_egis']) : '');
   };
