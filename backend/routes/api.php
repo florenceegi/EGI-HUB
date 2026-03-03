@@ -346,15 +346,13 @@ Route::middleware(['auth:sanctum', 'ensure.2fa', 'super.admin'])->group(function
 
     /*
 |--------------------------------------------------------------------------
-| My Projects API (User's accessible projects)
+| My Projects & GDPR API (authenticated, no extra 2FA check)
 |--------------------------------------------------------------------------
+| Nota: auth/me, logout e profile sono già definiti nel gruppo superiore
+| (auth:sanctum + super.admin, senza ensure.2fa). Qui manteniamo solo
+| le route che non duplicano quelle precedenti.
 */
     Route::middleware('auth:sanctum')->group(function () {
-        Route::prefix('auth')->name('auth.')->group(function () {
-            Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-            Route::get('me', [AuthController::class, 'me'])->name('me');
-            Route::put('profile', [AuthController::class, 'updateProfile'])->name('profile');
-        });
 
         /*
     |--------------------------------------------------------------------------

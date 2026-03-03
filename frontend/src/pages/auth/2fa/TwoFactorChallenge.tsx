@@ -8,11 +8,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authApi } from '../../../services/authApi';
+import { useAuth } from '../../../contexts/AuthContext';
 import { QRCodeSVG } from 'qrcode.react';
 import { ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function TwoFactorChallenge() {
   const navigate = useNavigate();
+  const { updateUser } = useAuth();
   
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(true);
@@ -52,8 +54,17 @@ export default function TwoFactorChallenge() {
         // Se è la prima volta (pairing code config)
         await authApi.confirm2fa(code);
       }
-      
-      // Una volta sbloccato, ricarichiamo l'utente per aggiornare l'ability se necessario, quindi lo buttiamo in app
+
+      // Aggiorna i dati utente nel contesto (il token è ora ['*'] in DB)
+      try {
+        const freshUser = await authApi.getMe();
+        updateUser(freshUser);
+      } catch {
+        // getMe fallisce raramente qui, ma non blocchiamo il flusso
+      }
+
+      // Naviga all'app principale
+      navigate('/my-projects', { replace: true });
       navigate('/my-projects', { replace: true });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Codice 2FA non valido.');
