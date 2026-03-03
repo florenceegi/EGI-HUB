@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DollarSign, Loader2, AlertCircle, Edit2, Check, X, Trash2, ToggleLeft, ToggleRight, Settings } from 'lucide-react';
 import api from '../../services/api';
@@ -73,20 +73,8 @@ export default function FeaturePricing() {
   // Modal dettaglio (feature_name, benefits, max_egis)
   const [detailItem, setDetailItem] = useState<AiFeaturePricing | null>(null);
   const [detailName, setDetailName] = useState('');
-  const [detailBenefits, setDetailBenefits] = useState(''); // una riga per benefit
+  const [detailBenefits, setDetailBenefits] = useState('');
   const [detailMaxEgis, setDetailMaxEgis] = useState('');
-  const detailDialogRef = useRef<HTMLDialogElement>(null);
-
-  // DaisyUI v5: usa showModal()/close() nativi per overlay corretto
-  useEffect(() => {
-    const dialog = detailDialogRef.current;
-    if (!dialog) return;
-    if (detailItem) {
-      dialog.showModal();
-    } else {
-      dialog.close();
-    }
-  }, [detailItem]);
 
   // === QUERY ===
   const { data, isLoading, error } = useQuery<ApiResponse>({
@@ -457,77 +445,88 @@ export default function FeaturePricing() {
       </div>
     </div>
 
-      {/* MODAL DETTAGLIO — feature_name, benefits, max_egis (DaisyUI v5: showModal()) */}
-      <dialog ref={detailDialogRef} className="modal">
-        <div className="modal-box max-w-lg">
-          {detailItem && (
-            <>
-              <h3 className="mb-4 text-lg font-bold">Modifica dettagli piano</h3>
-              <p className="mb-4 text-sm text-base-content/50 font-mono">{detailItem.feature_code}</p>
+      {/* MODAL DETTAGLIO — overlay Tailwind puro, nessuna dipendenza DaisyUI modal */}
+      {detailItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/60" onClick={() => setDetailItem(null)} />
 
-              <div className="space-y-4">
-                {/* Nome */}
-                <div className="form-control">
-                  <label className="label"><span className="label-text font-semibold">Nome piano</span></label>
-                  <input
-                    type="text"
-                    className="input input-bordered w-full"
-                    value={detailName}
-                    onChange={e => setDetailName(e.target.value)}
-                  />
-                </div>
+          {/* Box */}
+          <div className="relative z-10 w-full max-w-lg rounded-2xl bg-base-100 shadow-2xl p-6 flex flex-col gap-5">
 
-                {/* max_egis — solo per platform_services */}
-                {detailItem.feature_category === 'platform_services' && (
-                  <div className="form-control">
-                    <label className="label">
-                      <span className="label-text font-semibold">Max EGI per collezione</span>
-                      <span className="label-text-alt text-base-content/40">vuoto = illimitato</span>
-                    </label>
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="es. 19"
-                      className="input input-bordered w-full"
-                      value={detailMaxEgis}
-                      onChange={e => setDetailMaxEgis(e.target.value)}
-                    />
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-bold">Modifica dettagli piano</h3>
+                <p className="text-xs text-base-content/40 font-mono mt-1">{detailItem.feature_code}</p>
+              </div>
+              <button className="btn btn-ghost btn-sm btn-circle" onClick={() => setDetailItem(null)}>
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Campi */}
+            <div className="flex flex-col gap-4">
+              {/* Nome piano */}
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-semibold">Nome piano</label>
+                <input
+                  type="text"
+                  className="input input-bordered w-full"
+                  value={detailName}
+                  onChange={e => setDetailName(e.target.value)}
+                />
+              </div>
+
+              {/* max_egis — solo platform_services */}
+              {detailItem.feature_category === 'platform_services' && (
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-baseline justify-between">
+                    <label className="text-sm font-semibold">Max EGI per collezione</label>
+                    <span className="text-xs text-base-content/40">vuoto = illimitato</span>
                   </div>
-                )}
-
-                {/* Benefits */}
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text font-semibold">Benefits</span>
-                    <span className="label-text-alt text-base-content/40">una riga per voce</span>
-                  </label>
-                  <textarea
-                    className="textarea textarea-bordered w-full h-36 font-mono text-sm"
-                    placeholder={"Fino a 19 EGI per collezione\nAnalytics completo\nSupporto prioritario"}
-                    value={detailBenefits}
-                    onChange={e => setDetailBenefits(e.target.value)}
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="es. 19"
+                    className="input input-bordered w-full"
+                    value={detailMaxEgis}
+                    onChange={e => setDetailMaxEgis(e.target.value)}
                   />
                 </div>
-              </div>
+              )}
 
-              <div className="modal-action">
-                <button className="btn btn-ghost" onClick={() => setDetailItem(null)}>Annulla</button>
-                <button
-                  className="btn btn-primary"
-                  disabled={detailMutation.isPending || !detailName.trim()}
-                  onClick={saveDetail}
-                >
-                  {detailMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Salva
-                </button>
+              {/* Benefits */}
+              <div className="flex flex-col gap-1">
+                <div className="flex items-baseline justify-between">
+                  <label className="text-sm font-semibold">Benefits</label>
+                  <span className="text-xs text-base-content/40">una riga per voce</span>
+                </div>
+                <textarea
+                  rows={6}
+                  className="textarea textarea-bordered w-full font-mono text-sm resize-y"
+                  placeholder={"Fino a 19 EGI per collezione\nAnalytics completo\nSupporto prioritario"}
+                  value={detailBenefits}
+                  onChange={e => setDetailBenefits(e.target.value)}
+                />
               </div>
-            </>
-          )}
+            </div>
+
+            {/* Azioni */}
+            <div className="flex justify-end gap-2 pt-2 border-t border-base-200">
+              <button className="btn btn-ghost" onClick={() => setDetailItem(null)}>Annulla</button>
+              <button
+                className="btn btn-primary"
+                disabled={detailMutation.isPending || !detailName.trim()}
+                onClick={saveDetail}
+              >
+                {detailMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                Salva
+              </button>
+            </div>
+          </div>
         </div>
-        <form method="dialog" className="modal-backdrop">
-          <button onClick={() => setDetailItem(null)}>close</button>
-        </form>
-      </dialog>
+      )}
     </>
   );
 }
