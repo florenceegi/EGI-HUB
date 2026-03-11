@@ -463,17 +463,30 @@ export default function ProjectMaintenance() {
                 </div>
 
                 {/* token display */}
-                <div
-                  className="text-center py-3 px-4 rounded-lg font-mono font-black text-xl tracking-[0.15em] select-all cursor-text"
-                  style={{
-                    background: 'rgba(0,0,0,0.4)',
-                    border: '1px solid rgba(220,38,38,0.3)',
-                    color: '#fca5a5',
-                    textShadow: '0 0 20px rgba(220,38,38,0.4)',
-                  }}
-                  title="Clicca per selezionare tutto"
-                >
-                  {CONFIRM_TOKEN}
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Codice di conferma — copia e incolla nel campo sotto:
+                  </p>
+                  <div
+                    className="select-all cursor-text"
+                    style={{
+                      display: 'inline-block',
+                      padding: '10px 28px',
+                      borderRadius: '6px',
+                      fontFamily: 'monospace',
+                      fontWeight: 900,
+                      fontSize: '1.35rem',
+                      letterSpacing: '0.18em',
+                      color: '#ffffff',
+                      background: 'rgba(220,38,38,0.85)',
+                      border: '2px solid rgba(252,165,165,0.6)',
+                      boxShadow: '0 0 24px rgba(220,38,38,0.5), inset 0 1px 0 rgba(255,255,255,0.15)',
+                      textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                    }}
+                    title="Clicca per selezionare — poi incolla nel campo sotto"
+                  >
+                    {CONFIRM_TOKEN}
+                  </div>
                 </div>
 
                 {/* input */}
