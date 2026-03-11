@@ -143,6 +143,48 @@ Bypass: `git commit --no-verify` (solo se intenzionale)
  */
 ```
 
+---
+
+## 📚 Documentazione Ufficiale — SSOT
+
+> **L'unica fonte di verità per tutta la documentazione tecnica dell'ecosistema è `/home/fabio/EGI-DOC/docs`.**
+
+### 📁 Mappa Progetto → Cartella Docs
+
+| Progetto                | Cartella in EGI-DOC        |
+|-------------------------|----------------------------|
+| FlorenceArtEGI (EGI)    | `docs/egi/`                |
+| EGI-HUB                 | `docs/egi-hub/`            |
+| NATAN_LOC               | `docs/natan-loc/`          |
+| EGI-INFO                | `docs/egi-info/`           |
+| EGI-HUB-HOME-REACT      | `docs/egi-home/`           |
+| Ecosistema (generale)   | `docs/ecosistema/`         |
+| AWS Infrastructure      | `docs/aws/`                |
+| Oracode OS3             | `docs/oracode/`            |
+
+❌ **VIETATO** cercare o creare documentazione fuori da `/home/fabio/EGI-DOC/docs`.
+
+### 🔄 Regola DOC-SYNC (P1 — MUST)
+
+**Ogni modifica alla codebase che cambia comportamento, architettura, API, flussi o configurazione DEVE essere seguita dall'aggiornamento del file `.md` corrispondente in EGI-DOC.**
+
+```
+Codebase change → identifica .md in EGI-DOC → aggiorna docs → commit entrambi
+```
+
+#### ✅ Checklist DOC-SYNC (obbligatoria a fine task)
+
+```
+□ Ho modificato comportamento / architettura / API / flusso?
+    → SÌ: identifica il .md in EGI-DOC/docs/<cartella-progetto>/
+□ Il file .md esiste già?
+    → SÌ: aggiornalo
+    → NO: crea il file nella cartella giusta in EGI-DOC
+□ Le modifiche alla doc sono nello stesso commit/PR della codebase
+```
+
+> 🛑 Una feature non documentata in EGI-DOC è una feature **incompleta**.
+
 <!-- ══════════════════════════════════════════════════════════════
      FINE CORE CONDIVISO — Da qui in poi: specifico per EGI-HUB
      ══════════════════════════════════════════════════════════════ -->

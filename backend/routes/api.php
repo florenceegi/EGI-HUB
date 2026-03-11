@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 /**
  * EGI-HUB API Routes
- * 
+ *
  * API-only routes returning JSON responses.
  * Consumed by React frontend and external projects.
- * 
+ *
  * @package EGI-HUB
  * @author Fabio Cherici
  * @version 1.1.0
  * @date 2025-12-03
- * 
+ *
  * NOTA: "Projects" in EGI-HUB sono le applicazioni SaaS (NATAN_LOC, EGI, etc.)
  * mentre "Tenants" sono i clienti finali di ogni progetto.
  */
@@ -55,6 +55,7 @@ use App\Http\Controllers\Api\Superadmin\PadminSymbolsController;
 use App\Http\Controllers\Api\Superadmin\PadminSearchController;
 use App\Http\Controllers\Api\Superadmin\PadminStatisticsController;
 use App\Http\Controllers\Api\Superadmin\DaemonController;
+use App\Http\Controllers\Api\Superadmin\ProjectMaintenanceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -330,6 +331,14 @@ Route::middleware(['auth:sanctum', 'ensure.2fa', 'super.admin'])->group(function
 
         // Stack detection (artisan/composer/npm) — cached in metadata for 1h
         Route::post('{project}/detect-stack', [ProjectController::class, 'detectStack'])->name('detect-stack');
+
+        // ── Maintenance (operazioni distruttive — SuperAdmin + 2FA obbligatorio) ──
+        Route::prefix('{project}/maintenance')->name('maintenance.')->group(function () {
+            // EGI Asset Purge: dry-run (safe, no changes)
+            Route::post('egi-purge/dry-run', [ProjectMaintenanceController::class, 'egiPurgeDryRun'])->name('egi-purge.dry-run');
+            // EGI Asset Purge: esecuzione reale (richiede confirm_token nel body)
+            Route::post('egi-purge/execute', [ProjectMaintenanceController::class, 'egiPurgeExecute'])->name('egi-purge.execute');
+        });
 
         // Project activities
         Route::get('{project}/activities', [ProjectActivityController::class, 'forProject'])->name('activities');

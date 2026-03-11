@@ -13,8 +13,7 @@ use Aws\Exception\AwsException;
  * @purpose Esegue comandi remoti su EC2 via AWS SSM SendCommand.
  *          Utilizzato per deploy e manutenzione dei progetti EGI dall'HUB.
  */
-class RemoteCommandService
-{
+class RemoteCommandService {
     /**
      * Comandi predefiniti (chiave → shell command da eseguire nella deploy_path).
      */
@@ -28,12 +27,16 @@ class RemoteCommandService
         'migrate'          => 'if [ -f artisan ]; then php artisan migrate --force; else echo "Skip: artisan non trovato"; fi',
         'queue_restart'    => 'if [ -f artisan ]; then php artisan queue:restart; else echo "Skip: artisan non trovato"; fi',
         'deploy_full'      => 'git pull && ([ -f composer.json ] && composer install --no-dev --optimize-autoloader || true) && ([ -f package.json ] && npm install && npm run build || true) && ([ -f artisan ] && php artisan migrate --force && php artisan config:cache && php artisan cache:clear && php artisan queue:restart || true)',
+        // ── EGI Maintenance ──────────────────────────────────────────────────────
+        // Dry-run: mostra cosa verrebbe eliminato (S3, Pinata, DB). Nessuna modifica.
+        'egi_purge_dryrun' => 'if [ -f artisan ]; then php8.3 artisan egi:purge-all 2>&1; else echo "SKIP: artisan non trovato in questa path"; fi',
+        // Purge reale: --force bypassa la richiesta interattiva. La UI è la safety gate.
+        'egi_purge_force'  => 'if [ -f artisan ]; then php8.3 artisan egi:purge-all --force 2>&1; else echo "SKIP: artisan non trovato in questa path"; fi',
     ];
 
     private SsmClient $ssm;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->ssm = new SsmClient([
             'version' => 'latest',
             // AWS_EC2_REGION = regione dell'istanza EC2 (eu-north-1)
@@ -45,8 +48,7 @@ class RemoteCommandService
     /**
      * Esegue un comando predefinito per un progetto.
      */
-    public function runPredefined(Project $project, string $key): array
-    {
+    public function runPredefined(Project $project, string $key): array {
         if (!isset(self::PREDEFINED[$key])) {
             return ['success' => false, 'output' => "Comando '{$key}' non riconosciuto.", 'status' => 'Failed'];
         }
@@ -59,8 +61,7 @@ class RemoteCommandService
      *
      * @return array{success: bool, output: string, status: string}
      */
-    public function run(Project $project, string $command): array
-    {
+    public function run(Project $project, string $command): array {
         $deployPath = $this->getDeployPath($project);
         $instanceId = $this->getInstanceId($project);
 
@@ -79,7 +80,6 @@ class RemoteCommandService
 
             // Poll per risultato (max 90s = 30 tentativi × 3s)
             return $this->pollResult($commandId, $instanceId, 30, 3);
-
         } catch (AwsException $e) {
             return [
                 'success' => false,
@@ -102,8 +102,7 @@ class RemoteCommandService
      * @return array{has_artisan: bool, has_composer: bool, has_npm: bool, _detected: bool}
      *         _detected=false indica che SSM ha fallito → il caller NON deve cachare il risultato.
      */
-    public function detectStack(Project $project): array
-    {
+    public function detectStack(Project $project): array {
         $check = 'files=""; [ -f artisan ] && files="${files}artisan,"; [ -f composer.json ] && files="${files}composer,"; [ -f package.json ] && files="${files}npm,"; echo "${files%,}"';
 
         $result = $this->run($project, $check);
@@ -138,8 +137,7 @@ class RemoteCommandService
     /**
      * Esegue il polling su SSM GetCommandInvocation fino a completamento.
      */
-    private function pollResult(string $commandId, string $instanceId, int $maxAttempts, int $waitSec): array
-    {
+    private function pollResult(string $commandId, string $instanceId, int $maxAttempts, int $waitSec): array {
         for ($i = 0; $i < $maxAttempts; $i++) {
             sleep($waitSec);
 
@@ -181,8 +179,7 @@ class RemoteCommandService
      * Determina il deploy path per un progetto.
      * Priorità: metadata['deploy_path'] → metadata['dns_name'] → slug fallback.
      */
-    private function getDeployPath(Project $project): string
-    {
+    private function getDeployPath(Project $project): string {
         if (!empty($project->metadata['deploy_path'])) {
             return $project->metadata['deploy_path'];
         }
@@ -205,8 +202,7 @@ class RemoteCommandService
      * Determina l'ID dell'istanza EC2 per un progetto.
      * Priorità: metadata['ec2_instance_id'] → env AWS_EC2_INSTANCE_ID → hardcoded default.
      */
-    private function getInstanceId(Project $project): string
-    {
+    private function getInstanceId(Project $project): string {
         return $project->metadata['ec2_instance_id']
             ?? env('AWS_EC2_INSTANCE_ID', 'i-0940cdb7b955d1632');
     }

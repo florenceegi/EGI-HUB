@@ -167,6 +167,13 @@ const getProjectMenuGroups = (projectSlug: string): MenuGroup[] => [
       { name: 'Permessi', path: `/project/${projectSlug}/permissions`, icon: <Lock className="w-4 h-4" /> },
     ],
   },
+  {
+    name: 'Manutenzione',
+    icon: <Wrench className="w-5 h-5 text-error" />,
+    items: [
+      { name: 'EGI Asset Purge', path: `/project/${projectSlug}/maintenance`, icon: <AlertTriangle className="w-4 h-4 text-error" /> },
+    ],
+  },
 ];
 
 const alertClass: Record<string, string> = {

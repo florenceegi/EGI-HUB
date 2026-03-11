@@ -193,6 +193,38 @@ export async function discoverProjects(options?: {
   return response.data;
 }
 
+// ── Maintenance API ───────────────────────────────────────────────────────────
+
+export interface MaintenanceResult {
+  success: boolean;
+  output: string;
+  status?: string;
+  dry_run: boolean;
+}
+
+/**
+ * Esegue un dry-run della EGI Asset Purge sul progetto remoto.
+ * Non modifica nulla — mostra solo cosa verrebbe eliminato.
+ */
+export async function egiPurgeDryRun(id: number): Promise<MaintenanceResult> {
+  const response = await api.post(`/projects/${id}/maintenance/egi-purge/dry-run`);
+  return response.data;
+}
+
+/**
+ * Esegue la EGI Asset Purge reale sul progetto remoto.
+ * Richiede confirmToken === "PURGE ALL EGI".
+ */
+export async function egiPurgeExecute(
+  id: number,
+  confirmToken: string
+): Promise<MaintenanceResult> {
+  const response = await api.post(`/projects/${id}/maintenance/egi-purge/execute`, {
+    confirm_token: confirmToken,
+  });
+  return response.data;
+}
+
 export default {
   getProjects,
   getProject,
@@ -208,6 +240,8 @@ export default {
   getAggregatedData,
   discoverProjects,
   runRemoteCommand,
+  egiPurgeDryRun,
+  egiPurgeExecute,
 };
 
 // Named export for component usage

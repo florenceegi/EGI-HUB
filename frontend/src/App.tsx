@@ -45,6 +45,7 @@ import ProjectsList from './pages/projects/ProjectsList'
 import CreateProject from './pages/projects/CreateProject'
 import ProjectActivity from './pages/projects/ProjectActivity'
 import ProjectAdminsList from './pages/projects/ProjectAdminsList'
+import ProjectMaintenance from './pages/projects/ProjectMaintenance'
 import TenantConfigurations from './pages/tenants/TenantConfigurations'
 import TenantPlans from './pages/tenants/TenantPlans'
 import TenantStorage from './pages/tenants/TenantStorage'
@@ -197,6 +198,7 @@ function AppRoutes() {
         {/* Project Admin */}
         <Route path="project/:slug/admins" element={<ProjectAdminsList />} />
         <Route path="project/:slug/permissions" element={<ComingSoon title="Permessi" />} />
+        <Route path="project/:slug/maintenance" element={<ProjectMaintenance />} />
         
         {/* Legacy routes (deprecated) */}
         <Route path="tenants" element={<ProjectsList />} />
