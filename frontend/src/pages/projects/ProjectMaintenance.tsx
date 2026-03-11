@@ -32,9 +32,15 @@ const CONFIRM_TOKEN = 'PURGE ALL EGI';
 
 /* ─── helper: estrae numeri dal dry-run output ─── */
 function parseStats(output: string) {
-  const egi = output.match(/EGI trovati[^\d]*(\d+)/i)?.[1] ?? '—';
-  const s3  = output.match(/file S3[^\d]*(\d+)/i)?.[1]  ?? '—';
-  const cid = output.match(/CID[^\d]*(\d+)/i)?.[1]      ?? '—';
+  // Match "EGI records (hard delete): 22" (DB summary line — most reliable)
+  // Fallback: "Found 22 EGIs to process." / "Found <comment>22</comment> EGIs"
+  const egi = output.match(/EGI records \(hard delete\)[^\d]*(\d+)/i)?.[1]
+           ?? output.match(/Found[^\d<]*(?:<[^>]+>)?(\d+)[^<]*EGIs/i)?.[1]
+           ?? '—';
+  // Match "Files to attempt delete: 110" / "Files to attempt delete: <comment>110</comment>"
+  const s3  = output.match(/Files to attempt delete[^\d<]*(?:<[^>]+>)?(\d+)/i)?.[1] ?? '—';
+  // Match "Unique CIDs to unpin: 18" / with optional <comment> tag
+  const cid = output.match(/Unique CIDs to unpin[^\d<]*(?:<[^>]+>)?(\d+)/i)?.[1]   ?? '—';
   return { egi, s3, cid };
 }
 
