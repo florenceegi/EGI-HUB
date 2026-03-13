@@ -23,6 +23,23 @@ import type {
   MyProject
 } from '../types/project';
 
+export interface ProjectTenant {
+  id: number;
+  system_project_id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  url: string | null;
+  subdomain: string | null;
+  status: 'active' | 'inactive' | 'suspended' | 'trial';
+  plan: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  is_healthy: boolean;
+  last_health_check: string | null;
+  created_at: string;
+}
+
 /**
  * Get all projects
  */
@@ -362,6 +379,16 @@ export async function reactivateProjectAdmin(
     `/projects/${slug}/admins/${adminId}/reactivate`
   );
   return { success: response.data.success, message: response.data.message || 'Riattivato' };
+}
+
+/**
+ * Get tenants for a specific project (by slug)
+ */
+export async function getProjectTenants(slug: string): Promise<ProjectTenant[]> {
+  const response = await api.get<{ success: boolean; data: ProjectTenant[]; project: { id: number; name: string; slug: string } }>(
+    `/projects/${slug}/tenants`
+  );
+  return response.data.data;
 }
 
 // Export all admin functions together

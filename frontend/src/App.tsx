@@ -52,6 +52,9 @@ import TenantStorage from './pages/tenants/TenantStorage'
 
 // Project Context Pages (when inside a specific project)
 import ProjectDashboard from './pages/projects/ProjectDashboard'
+import ProjectTenantsList from './pages/projects/ProjectTenantsList'
+import ProjectCreateTenant from './pages/projects/ProjectCreateTenant'
+import ProjectCreateAdminBootstrap from './pages/projects/ProjectCreateAdminBootstrap'
 
 import TwoFactorChallenge from './pages/auth/2fa/TwoFactorChallenge'
 
@@ -204,8 +207,9 @@ function AppRoutes() {
         <Route path="project/:slug/activity" element={<ComingSoon title="Attività Progetto" />} />
         
         {/* Tenants Management (inside project) */}
-        <Route path="project/:slug/tenants" element={<ComingSoon title="Lista Tenants" />} />
-        <Route path="project/:slug/tenants/create" element={<ComingSoon title="Nuovo Tenant" />} />
+        <Route path="project/:slug/tenants" element={<ProjectTenantsList />} />
+        <Route path="project/:slug/tenants/create" element={<ProjectCreateTenant />} />
+        <Route path="project/:slug/tenants/:tenantId/admin/create" element={<ProjectCreateAdminBootstrap />} />
         
         {/* Project Settings */}
         <Route path="project/:slug/settings" element={<ComingSoon title="Impostazioni Progetto" />} />

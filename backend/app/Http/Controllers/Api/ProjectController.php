@@ -344,6 +344,43 @@ class ProjectController extends Controller {
     }
 
     /**
+     * Lista i tenant di un progetto specifico (per slug).
+     *
+     * @purpose Esporre i tenant associati a un progetto per la UI di gestione EGI-HUB.
+     */
+    public function tenants(string $slug): JsonResponse
+    {
+        try {
+            $project = Project::where('slug', $slug)->firstOrFail();
+
+            $tenants = \App\Models\Tenant::where('system_project_id', $project->id)
+                ->orderBy('name')
+                ->get();
+
+            $this->logger->info('Fetched tenants for project', [
+                'project_slug'  => $slug,
+                'project_id'    => $project->id,
+                'tenant_count'  => $tenants->count(),
+                'log_category'  => 'PROJECT_TENANTS_LIST',
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'data'    => $tenants,
+                'project' => [
+                    'id'   => $project->id,
+                    'name' => $project->name,
+                    'slug' => $project->slug,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return $this->errorManager->handle('PROJECT_TENANTS_ERROR', [
+                'slug' => $slug,
+            ], $e);
+        }
+    }
+
+    /**
      * Scopre i progetti leggendo i sottodomini da AWS Route 53 e fa upsert nel DB.
      * Esegue il comando Artisan projects:discover in modo sincrono.
      */

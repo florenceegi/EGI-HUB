@@ -353,6 +353,9 @@ Route::middleware(['auth:sanctum', 'ensure.2fa', 'super.admin'])->group(function
         Route::delete('{slug}/admins/{adminId}', [ProjectAdminController::class, 'destroy'])->name('admins.destroy');
         Route::post('{slug}/admins/{adminId}/suspend', [ProjectAdminController::class, 'suspend'])->name('admins.suspend');
         Route::post('{slug}/admins/{adminId}/reactivate', [ProjectAdminController::class, 'reactivate'])->name('admins.reactivate');
+
+        // Tenants within a project
+        Route::get('{slug}/tenants', [ProjectController::class, 'tenants'])->name('tenants.index');
     });
 
     /*
