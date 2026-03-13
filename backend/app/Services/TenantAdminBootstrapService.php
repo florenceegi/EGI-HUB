@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\BootstrapStatus;
+use App\Enums\UserStatus;
 use App\Mail\TenantAdminInvitationMail;
+use App\Models\ProjectAdmin;
 use App\Models\Tenant;
 use App\Models\TenantAdminBootstrap;
 use App\Models\User;
@@ -71,6 +73,7 @@ class TenantAdminBootstrapService
                 'email'          => $data['email'],
                 'password'       => Hash::make(Str::random(32)), // password temporanea sicura
                 'is_super_admin' => false,
+                'status'         => UserStatus::Pending->value,
             ]);
 
             $this->logger->info('TenantAdminBootstrap: utente placeholder creato', [
@@ -181,13 +184,32 @@ class TenantAdminBootstrapService
 
         return DB::transaction(function () use ($bootstrap, $password) {
 
-            // Aggiorna la password dell'utente e rendilo attivo
+            // Aggiorna la password dell'utente, attivalo e assegna il ruolo admin
             if ($bootstrap->user_id) {
                 $user = User::find($bootstrap->user_id);
                 if ($user) {
                     $user->update([
                         'password'          => Hash::make($password),
                         'email_verified_at' => now(),
+                        'status'            => UserStatus::Active->value,
+                    ]);
+
+                    // Crea il record ProjectAdmin: l'utente diventa admin del progetto
+                    ProjectAdmin::create([
+                        'project_id'  => $bootstrap->system_project_id,
+                        'user_id'     => $user->id,
+                        'role'        => ProjectAdmin::ROLE_ADMIN,
+                        'permissions' => ProjectAdmin::DEFAULT_PERMISSIONS[ProjectAdmin::ROLE_ADMIN],
+                        'assigned_by' => $bootstrap->created_by,
+                        'assigned_at' => now(),
+                        'is_active'   => true,
+                        'notes'       => 'Creato da bootstrap ' . $bootstrap->id . ' (contratto: ' . $bootstrap->contract_reference . ')',
+                    ]);
+
+                    $this->logger->info('TenantAdminBootstrap: ruolo ProjectAdmin assegnato', [
+                        'user_id'    => $user->id,
+                        'project_id' => $bootstrap->system_project_id,
+                        'role'       => ProjectAdmin::ROLE_ADMIN,
                     ]);
                 }
             }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -32,6 +33,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_super_admin',
+        'status',
     ];
 
     /**
@@ -55,6 +57,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
+            'status' => UserStatus::class,
         ];
     }
 
@@ -111,6 +114,22 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         return $this->is_super_admin ?? false;
+    }
+
+    /**
+     * Verifica se l'utente è in attesa di attivazione
+     */
+    public function isPending(): bool
+    {
+        return $this->status === UserStatus::Pending;
+    }
+
+    /**
+     * Verifica se l'utente è attivo
+     */
+    public function isActive(): bool
+    {
+        return $this->status === UserStatus::Active;
     }
 
     /**
