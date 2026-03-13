@@ -123,7 +123,8 @@ export interface ProjectAdminsMeta {
 }
 
 export interface CreateProjectAdminData {
-  user_id: number;
+  user_id?: number;
+  email?: string;
   role?: ProjectAdminRole;
   permissions?: Partial<ProjectAdminPermissions>;
   expires_at?: string;

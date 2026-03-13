@@ -140,7 +140,8 @@ class ProjectAdminController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required_without:email|nullable|exists:users,id',
+            'email' => 'required_without:user_id|nullable|email|exists:users,email',
             'role' => 'sometimes|in:owner,admin,viewer',
             'permissions' => 'sometimes|array',
             'expires_at' => 'sometimes|nullable|date|after:now',
@@ -155,7 +156,20 @@ class ProjectAdminController extends Controller
             ], 422);
         }
 
-        $userId = $request->input('user_id');
+        // Resolve user by email if user_id not provided
+        if ($request->filled('email') && !$request->filled('user_id')) {
+            $userByEmail = User::where('email', $request->input('email'))->first();
+            if (!$userByEmail) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Utente non trovato con questa email',
+                    'errors' => ['email' => ['Nessun utente trovato con questa email']],
+                ], 422);
+            }
+            $userId = $userByEmail->id;
+        } else {
+            $userId = $request->input('user_id');
+        }
 
         // Verifica che l'utente non sia già admin
         $existing = $project->adminRecords()->where('user_id', $userId)->first();
