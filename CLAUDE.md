@@ -242,6 +242,49 @@ git status && git branch
 | `@frontend-specialist` | frontend/ — Componenti React, hooks, UI |
 | `@doc-sync-guardian` | Sempre dopo ogni task — P0-11 |
 
+## 🚀 Deploy EGI-HUB
+
+```
+EC2:   i-0940cdb7b955d1632  (eu-north-1) — stessa istanza di NATAN_LOC
+Path:  /home/forge/hub.florenceegi.com
+URL:   https://hub.florenceegi.com
+```
+
+### Step 1 — Git pull + cache Laravel (SEMPRE)
+
+```bash
+aws ssm send-command \
+  --region eu-north-1 \
+  --instance-ids i-0940cdb7b955d1632 \
+  --document-name AWS-RunShellScript \
+  --parameters 'commands=["sudo -u forge bash -c \"cd /home/forge/hub.florenceegi.com && git pull origin main && cd backend && php artisan config:cache && php artisan view:clear\" 2>&1"]'
+```
+
+### Step 2 — Build frontend (SOLO se modificati file TS/CSS/TSX)
+
+```bash
+aws ssm send-command \
+  --region eu-north-1 \
+  --instance-ids i-0940cdb7b955d1632 \
+  --document-name AWS-RunShellScript \
+  --parameters 'commands=["sudo -u forge bash -c \"cd /home/forge/hub.florenceegi.com && git pull origin main && cd frontend && npm run build\" 2>&1"]'
+```
+
+### Verifica risultato
+
+```bash
+aws ssm get-command-invocation \
+  --region eu-north-1 \
+  --command-id <ID_RESTITUITO> \
+  --instance-id i-0940cdb7b955d1632 \
+  --query "[Status,StandardOutputContent]" \
+  --output json
+```
+
+> `public/build/` in `.gitignore` → rebuilda sempre dopo pull se tocchi TS/CSS/TSX
+
+---
+
 ## 🛠️ Comandi
 
 | Comando | Uso |
@@ -249,7 +292,7 @@ git status && git branch
 | `/mission` | Task strutturata multi-file |
 | `/fix` | Debug e fix P0-8 |
 | `/new-feature` | Progettazione feature completa |
-| `/deploy` | Deploy EC2 via SSM (hub.florenceegi.com) |
+| `/deploy` | Vedi sezione "Deploy EGI-HUB" sopra |
 
 ---
 
