@@ -202,23 +202,18 @@ export default function ProjectAdminsList() {
 
       {/* Stats */}
       {meta && (
-        <div className="stats shadow bg-base-100">
-          <div className="stat">
-            <div className="stat-title">Totale</div>
-            <div className="stat-value text-2xl">{meta.total}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-title">Owner</div>
-            <div className="stat-value text-2xl text-primary">{meta.owners}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-title">Admin</div>
-            <div className="stat-value text-2xl text-success">{meta.admins}</div>
-          </div>
-          <div className="stat">
-            <div className="stat-title">Viewer</div>
-            <div className="stat-value text-2xl text-info">{meta.viewers}</div>
-          </div>
+        <div className="grid grid-cols-4 gap-4">
+          {[
+            { label: 'Totale', value: meta.total, color: 'text-gray-800' },
+            { label: 'Owner', value: meta.owners, color: 'text-blue-600' },
+            { label: 'Admin', value: meta.admins, color: 'text-green-600' },
+            { label: 'Viewer', value: meta.viewers, color: 'text-sky-600' },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="bg-white rounded-xl shadow p-4 text-center border border-gray-100">
+              <div className="text-sm text-gray-500 mb-1">{label}</div>
+              <div className={`text-3xl font-bold ${color}`}>{value}</div>
+            </div>
+          ))}
         </div>
       )}
 
