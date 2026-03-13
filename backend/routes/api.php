@@ -56,6 +56,8 @@ use App\Http\Controllers\Api\Superadmin\PadminSearchController;
 use App\Http\Controllers\Api\Superadmin\PadminStatisticsController;
 use App\Http\Controllers\Api\Superadmin\DaemonController;
 use App\Http\Controllers\Api\Superadmin\ProjectMaintenanceController;
+use App\Http\Controllers\Api\TenantAdminBootstrapController;
+use App\Http\Controllers\Api\TenantAdminActivationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -457,3 +459,35 @@ Route::middleware(['auth:sanctum', 'ensure.2fa', 'super.admin'])->group(function
             ->name('delete');
     });
 }); // End of superadmin middleware group
+
+/*
+|--------------------------------------------------------------------------
+| Tenant Admin Bootstrap — SuperAdmin Only
+|--------------------------------------------------------------------------
+| Gestione del ciclo di vita degli amministratori tenant.
+| Richiede autenticazione Sanctum + privilegi SuperAdmin + 2FA.
+*/
+Route::prefix('admin/bootstraps')
+    ->middleware(['auth:sanctum', 'ensure.2fa', 'super.admin'])
+    ->name('admin.bootstraps.')
+    ->group(function () {
+        Route::get('/', [TenantAdminBootstrapController::class, 'index'])->name('index');
+        Route::post('/', [TenantAdminBootstrapController::class, 'store'])->name('store');
+        Route::get('/{bootstrap}', [TenantAdminBootstrapController::class, 'show'])->name('show');
+        Route::post('/{bootstrap}/resend', [TenantAdminBootstrapController::class, 'resend'])->name('resend');
+        Route::post('/{bootstrap}/suspend', [TenantAdminBootstrapController::class, 'suspend'])->name('suspend');
+        Route::post('/{bootstrap}/revoke', [TenantAdminBootstrapController::class, 'revoke'])->name('revoke');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| Attivazione Tenant Admin — Endpoint Pubblico
+|--------------------------------------------------------------------------
+| Accessibile senza autenticazione: l'admin usa il token monouso ricevuto via email.
+*/
+Route::prefix('activate')
+    ->name('activate.')
+    ->group(function () {
+        Route::get('/tenant-admin/{token}', [TenantAdminActivationController::class, 'show'])->name('tenant-admin.show');
+        Route::post('/tenant-admin/{token}', [TenantAdminActivationController::class, 'activate'])->name('tenant-admin.activate');
+    });

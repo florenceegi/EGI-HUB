@@ -55,6 +55,14 @@ import ProjectDashboard from './pages/projects/ProjectDashboard'
 
 import TwoFactorChallenge from './pages/auth/2fa/TwoFactorChallenge'
 
+// Bootstrap Management
+import BootstrapsList from './pages/bootstraps/BootstrapsList'
+import CreateBootstrap from './pages/bootstraps/CreateBootstrap'
+import BootstrapDetail from './pages/bootstraps/BootstrapDetail'
+
+// Public Activation
+import TenantAdminActivation from './pages/activation/TenantAdminActivation'
+
 // System Settings
 import SystemConfig from './pages/system/SystemConfig'
 import SystemDaemons from './pages/system/SystemDaemons'
@@ -109,6 +117,9 @@ function AppRoutes() {
           <Login />
         </PublicRoute>
       } />
+
+      {/* Public Activation Route — no auth required */}
+      <Route path="/activate/tenant-admin/:token" element={<TenantAdminActivation />} />
       <Route path="/register" element={
         <PublicRoute>
           <Register />
@@ -164,6 +175,11 @@ function AppRoutes() {
         <Route path="padmin/search" element={<PadminSearch />} />
         <Route path="padmin/statistics" element={<PadminStatistics />} />
         
+        {/* Bootstrap Management (SuperAdmin only) */}
+        <Route path="admin/bootstraps" element={<BootstrapsList />} />
+        <Route path="admin/bootstraps/new" element={<CreateBootstrap />} />
+        <Route path="admin/bootstraps/:id" element={<BootstrapDetail />} />
+
         {/* Global Project Management (SuperAdmin only) */}
         <Route path="projects" element={<ProjectsList />} />
         <Route path="projects/create" element={<CreateProject />} />
