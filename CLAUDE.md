@@ -132,6 +132,18 @@ PostgreSQL AWS RDS — Schema core ESCLUSIVAMENTE:
 [DEBITO]  database.php default search_path = hub,core,public
           → .env imposta correttamente core,public
           → Allineare il default in database.php a core,public
+
+[DEBITO]  Censimento modelli vs tabelle core — da approfondire
+          Confermati in core: AiFeature → ai_feature_pricing,
+                              DaemonProcess, EgiliTransaction (tabelle esistenti)
+          Da verificare: PadminScan, PadminSymbol, PadminViolation,
+                         ConsumptionLedger, EquilibriumEntry, FeaturePricing,
+                         FeaturedEgi, EgiTrait, AiTraitGeneration,
+                         CollectionUser, TenantSubscription, SubscriptionPlan,
+                         Promotion, PaymentProviderConfig e altri
+          → Possibili implementazioni future non ancora deployate in DB
+          → Verificare con: php artisan db:show --json (quando disponibile)
+          → Non blocca operatività — documentare progressivamente
 ```
 
 ---
