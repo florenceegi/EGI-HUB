@@ -5,7 +5,7 @@
  * Only Project Owners can add/modify/remove admins.
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   UserPlus,
@@ -51,7 +51,7 @@ export default function ProjectAdminsList() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
 
   // Modal state
-  const modalRef = useRef<HTMLDialogElement>(null);
+  const [showModal, setShowModal] = useState(false);
   const [modalEmail, setModalEmail] = useState('');
   const [modalRole, setModalRole] = useState<ProjectAdminRole>('viewer');
   const [modalLoading, setModalLoading] = useState(false);
@@ -61,8 +61,10 @@ export default function ProjectAdminsList() {
     setModalEmail('');
     setModalRole('viewer');
     setModalError(null);
-    modalRef.current?.showModal();
+    setShowModal(true);
   };
+
+  const closeModal = () => setShowModal(false);
 
   const handleAddAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +74,7 @@ export default function ProjectAdminsList() {
       setModalLoading(true);
       setModalError(null);
       await createProjectAdmin(slug, { email: modalEmail.trim(), role: modalRole });
-      modalRef.current?.close();
+      closeModal();
       await loadAdmins();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Errore durante l\'aggiunta dell\'admin';
@@ -386,90 +388,96 @@ export default function ProjectAdminsList() {
       </div>
 
       {/* Add Admin Modal */}
-      <dialog ref={modalRef} className="modal">
-        <div className="modal-box">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-lg flex items-center gap-2">
-              <UserPlus className="w-5 h-5" />
-              Aggiungi Admin
-            </h3>
-            <button
-              className="btn btn-ghost btn-sm btn-circle"
-              onClick={() => modalRef.current?.close()}
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <form onSubmit={handleAddAdmin} className="space-y-4">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Email utente *</span>
-              </label>
-              <input
-                type="email"
-                className="input input-bordered w-full"
-                placeholder="utente@esempio.com"
-                value={modalEmail}
-                onChange={(e) => setModalEmail(e.target.value)}
-                required
-                autoFocus
-              />
-              <label className="label">
-                <span className="label-text-alt text-base-content/60">L'utente deve essere già registrato in EGI-HUB</span>
-              </label>
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Ruolo</span>
-              </label>
-              <select
-                className="select select-bordered w-full"
-                value={modalRole}
-                onChange={(e) => setModalRole(e.target.value as ProjectAdminRole)}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={closeModal}
+          />
+          {/* Box */}
+          <div className="relative bg-base-100 rounded-2xl shadow-2xl w-full max-w-md p-6 z-10">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-primary" />
+                Aggiungi Admin al Progetto
+              </h3>
+              <button
+                className="btn btn-ghost btn-sm btn-circle"
+                onClick={closeModal}
+                aria-label="Chiudi"
               >
-                <option value="viewer">Viewer — Solo visualizzazione</option>
-                <option value="admin">Admin — Gestione tenant e config</option>
-                <option value="owner">Owner — Accesso completo</option>
-              </select>
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            {modalError && (
-              <div className="alert alert-error text-sm py-2">
-                <AlertCircle className="w-4 h-4" />
-                <span>{modalError}</span>
+            <form onSubmit={handleAddAdmin} className="space-y-4">
+              <div className="form-control">
+                <label className="label pb-1">
+                  <span className="label-text font-medium">Email utente *</span>
+                </label>
+                <input
+                  type="email"
+                  className="input input-bordered w-full"
+                  placeholder="utente@esempio.com"
+                  value={modalEmail}
+                  onChange={(e) => setModalEmail(e.target.value)}
+                  required
+                  autoFocus
+                />
+                <p className="text-xs text-base-content/50 mt-1">
+                  L'utente deve essere già registrato in EGI-HUB
+                </p>
               </div>
-            )}
 
-            <div className="modal-action mt-6">
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => modalRef.current?.close()}
-                disabled={modalLoading}
-              >
-                Annulla
-              </button>
-              <button
-                type="submit"
-                className="btn btn-primary gap-2"
-                disabled={modalLoading || !modalEmail.trim()}
-              >
-                {modalLoading ? (
-                  <span className="loading loading-spinner loading-sm"></span>
-                ) : (
-                  <UserPlus className="w-4 h-4" />
-                )}
-                Aggiungi
-              </button>
-            </div>
-          </form>
+              <div className="form-control">
+                <label className="label pb-1">
+                  <span className="label-text font-medium">Ruolo</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={modalRole}
+                  onChange={(e) => setModalRole(e.target.value as ProjectAdminRole)}
+                >
+                  <option value="viewer">Viewer — Solo visualizzazione</option>
+                  <option value="admin">Admin — Gestione tenant e configurazioni</option>
+                  <option value="owner">Owner — Accesso completo</option>
+                </select>
+              </div>
+
+              {modalError && (
+                <div className="alert alert-error py-2 text-sm">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{modalError}</span>
+                </div>
+              )}
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={closeModal}
+                  disabled={modalLoading}
+                >
+                  Annulla
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary gap-2"
+                  disabled={modalLoading || !modalEmail.trim()}
+                >
+                  {modalLoading
+                    ? <span className="loading loading-spinner loading-sm" />
+                    : <UserPlus className="w-4 h-4" />
+                  }
+                  Aggiungi
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-        <form method="dialog" className="modal-backdrop bg-black/50">
-          <button className="opacity-0 cursor-default" aria-hidden="true">close</button>
-        </form>
-      </dialog>
+      )}
     </div>
   );
 }
