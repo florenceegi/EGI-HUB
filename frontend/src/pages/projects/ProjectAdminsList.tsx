@@ -396,7 +396,7 @@ export default function ProjectAdminsList() {
             onClick={closeModal}
           />
           {/* Box */}
-          <div className="relative bg-base-100 rounded-2xl shadow-2xl w-full max-w-md p-6 z-10">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 z-10">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold flex items-center gap-2">
