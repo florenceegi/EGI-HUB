@@ -228,10 +228,10 @@ export default function ProjectDashboard() {
   }
 
   const dashboardCards: DashboardCard[] = [
-    { title: 'Tenant Attivi',  value: '—', icon: <Users className="w-8 h-8" />,    color: 'text-primary',   link: `/projects/${slug}/tenants` },
-    { title: 'Utenti Totali',  value: '—', icon: <Users className="w-8 h-8" />,    color: 'text-secondary', link: `/projects/${slug}/users` },
-    { title: 'API Calls (24h)',value: '—', icon: <BarChart3 className="w-8 h-8" />, color: 'text-accent',   link: `/projects/${slug}/analytics` },
-    { title: 'Logs',           value: 'Vedi', icon: <FileText className="w-8 h-8" />, color: 'text-info',   link: `/projects/${slug}/logs` },
+    { title: 'Tenant Attivi',  value: '—', icon: <Users className="w-8 h-8" />,    color: 'text-primary',   link: `/project/${slug}/tenants` },
+    { title: 'Utenti Totali',  value: '—', icon: <Users className="w-8 h-8" />,    color: 'text-secondary', link: `/project/${slug}/admins` },
+    { title: 'API Calls (24h)',value: '—', icon: <BarChart3 className="w-8 h-8" />, color: 'text-accent',   link: `/project/${slug}/activity` },
+    { title: 'Logs',           value: 'Vedi', icon: <FileText className="w-8 h-8" />, color: 'text-info',   link: `/project/${slug}/maintenance` },
   ];
 
   /** Badge stack rilevato */
@@ -326,7 +326,7 @@ export default function ProjectDashboard() {
             <h2 className="card-title"><Users className="w-5 h-5" />Gestione Tenant</h2>
             <p className="text-base-content/70">Gestisci i tenant (clienti) di questo progetto.</p>
             <div className="card-actions justify-end mt-4">
-              <Link to={`/projects/${slug}/tenants`} className="btn btn-primary btn-sm">Vai ai Tenant</Link>
+              <Link to={`/project/${slug}/tenants`} className="btn btn-primary btn-sm">Vai ai Tenant</Link>
             </div>
           </div>
         </div>
@@ -335,7 +335,7 @@ export default function ProjectDashboard() {
             <h2 className="card-title"><Settings className="w-5 h-5" />Configurazione</h2>
             <p className="text-base-content/70">Modifica le impostazioni e configurazioni del progetto.</p>
             <div className="card-actions justify-end mt-4">
-              <Link to={`/projects/${slug}/settings`} className="btn btn-outline btn-sm">Impostazioni</Link>
+              <Link to={`/project/${slug}/settings`} className="btn btn-outline btn-sm">Impostazioni</Link>
             </div>
           </div>
         </div>
@@ -344,7 +344,7 @@ export default function ProjectDashboard() {
             <h2 className="card-title"><ShieldCheck className="w-5 h-5" />Project Admins</h2>
             <p className="text-base-content/70">Gestisci chi ha accesso a questo progetto e con quali permessi.</p>
             <div className="card-actions justify-end mt-4">
-              <Link to={`/projects/${slug}/admins`} className="btn btn-outline btn-sm">Gestisci Admins</Link>
+              <Link to={`/project/${slug}/admins`} className="btn btn-outline btn-sm">Gestisci Admins</Link>
             </div>
           </div>
         </div>
