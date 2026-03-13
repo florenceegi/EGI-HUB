@@ -186,13 +186,33 @@ $tenant->getAccessibleTenantIds()
 
 ---
 
+## ⚡ Trigger Matrix DOC-SYNC
+
+Prima di chiudere ogni task, classifica la modifica:
+
+| Tipo | Definizione | DOC-SYNC |
+|------|-------------|----------|
+| 1 — Locale | Fix puntuale, output invariato | NO |
+| 2 — Comportamentale | Cambia output visibile, API o comportamento | SÌ → `EGI-DOC/docs/egi-hub/` |
+| 3 — Architetturale | Nuovo service/table/model/layer/dipendenza | SÌ → EGI-DOC + CLAUDE.md |
+| 4 — Contrattuale | Tocca GDPR/MiCA/ToS/compliance | SÌ + **approvazione Fabio PRIMA** |
+| 5 — Naming dominio | Rinomina entità/concetto del dominio | SÌ → grep tutti i file impattati |
+| 6 — Cross-project | Impatta schema `core` o altri organi | SÌ + **approvazione Fabio** |
+
+> Dubbio tra Tipo 1 e 2? → Tratta come Tipo 2.
+> Dettaglio completo: `EGI-DOC/docs/oracode/audit/02_TRIGGER_MATRIX.md`
+
+---
+
 ## ⚡ Checklist Pre-Risposta
 
 ```
 1. Ho TUTTE le info?                    → NO  = 🛑 CHIEDI
 2. Metodi verificati con grep?          → NO  = 🛑 grep prima
 3. Sto modificando un'Interface stabile?→ SÌ  = 🛑 APPROVAZIONE FABIO
-4. Task chiusa → DOC-SYNC?              → NO  = 🛑 NON CHIUDERE (P0-11)
+4. Search_path è core,public?           → NO  = 🛑 VERIFICA (mai schema natan)
+5. Tipo modifica → [1-6]?               → ?   = classifica con Trigger Matrix sopra
+6. DOC-SYNC eseguito (se Tipo 2+)?      → NO  = 🛑 NON CHIUDERE (P0-11)
 ```
 
 ## ⚡ Comandi Verifica Rapida
@@ -211,6 +231,37 @@ git status && git branch
 
 | CEO & OS3 Architect  | Fabio Cherici         | Visione, standard, autorità sulle Interface  |
 | CTO & Technical Lead | Padmin D. Curtis (AI) | Esecuzione, enforcement OS3, implementation  |
+
+---
+
+## 🗺️ Agenti
+
+| Agente | Quando usarlo |
+|--------|---------------|
+| `@laravel-specialist` | backend/ — Controllers, Services, Models, Migrations |
+| `@frontend-specialist` | frontend/ — Componenti React, hooks, UI |
+| `@doc-sync-guardian` | Sempre dopo ogni task — P0-11 |
+
+## 🛠️ Comandi
+
+| Comando | Uso |
+|---------|-----|
+| `/mission` | Task strutturata multi-file |
+| `/fix` | Debug e fix P0-8 |
+| `/new-feature` | Progettazione feature completa |
+| `/deploy` | Deploy EC2 via SSM (hub.florenceegi.com) |
+
+---
+
+## 🔍 Sistema Audit Oracode
+
+| Riferimento | Path |
+|-------------|------|
+| Target ID | T-003 (vedi TARGET_MATRIX) |
+| Runbook audit | `EGI-DOC/docs/oracode/audit/07_RUNBOOK.md` |
+| Enforcement Claude | `EGI-DOC/docs/oracode/audit/06_CLAUDE_CODE_ENFORCEMENT.md` |
+| Trigger Matrix completa | `EGI-DOC/docs/oracode/audit/02_TRIGGER_MATRIX.md` |
+| Report audit | `EGI-DOC/docs/oracode/audit/reports/` |
 
 ---
 
