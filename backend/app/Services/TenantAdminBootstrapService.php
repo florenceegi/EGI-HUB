@@ -66,27 +66,12 @@ class TenantAdminBootstrapService
             // Risolvi o crea il tenant
             $tenant = $this->resolveOrCreateTenant($data, $createdBy);
 
-            // Crea utente placeholder in stato pending
-            $user = User::create([
-                'name'           => $data['first_name'] . ' ' . $data['last_name'],
-                'email'          => $data['email'],
-                'password'       => Hash::make(Str::random(32)), // password temporanea sicura
-                'is_super_admin' => false,
-                'status'         => UserStatus::Pending->value,
-            ]);
-
-            $this->logger->info('TenantAdminBootstrap: utente placeholder creato', [
-                'user_id'   => $user->id,
-                'email'     => $user->email,
-                'tenant_id' => $tenant->id,
-            ]);
-
-            // Crea il record di bootstrap
+            // Crea il record di bootstrap — l'utente nasce solo all'attivazione nel progetto
             $bootstrap = TenantAdminBootstrap::create([
                 'system_project_id'  => $data['system_project_id'],
                 'tenant_id'          => $tenant->id,
-                'user_id'            => $user->id,
-                'contract_id'         => $data['contract_id'] ?? null,
+                'user_id'            => null,
+                'contract_id'        => $data['contract_id'] ?? null,
                 'first_name_snapshot' => $data['first_name'],
                 'last_name_snapshot'  => $data['last_name'],
                 'email_snapshot'      => $data['email'],
