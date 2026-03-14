@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Building2, Plus, Search, MoreVertical, RefreshCw, CheckCircle, XCircle, Clock, UserPlus, AlertTriangle } from 'lucide-react';
+import { Building2, Plus, Search, MoreVertical, RefreshCw, CheckCircle, XCircle, Clock, UserPlus, AlertTriangle, FileText } from 'lucide-react';
 import { getProjectTenants, type ProjectTenant } from '@/services/projectApi';
 
 export default function ProjectTenantsList() {
@@ -161,6 +161,15 @@ export default function ProjectTenantsList() {
                           >
                             <UserPlus className="w-4 h-4" />
                             Crea Admin
+                          </button>
+                        </li>
+                        <li>
+                          <button
+                            className="flex items-center gap-2"
+                            onClick={() => navigate(`/project/${slug}/tenants/${tenant.id}/contracts`)}
+                          >
+                            <FileText className="w-4 h-4" />
+                            Contratti
                           </button>
                         </li>
                       </ul>
