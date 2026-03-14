@@ -57,9 +57,8 @@ class StoreTenantAdminBootstrapRequest extends FormRequest
                 'unique:tenants,slug',
             ],
 
-            // Dati contrattuali
-            'contract_reference' => ['required', 'string', 'max:255'],
-            'contract_date'      => ['nullable', 'date'],
+            // Riferimento contratto (opzionale FK)
+            'contract_id' => ['nullable', 'integer', 'exists:contracts,id'],
 
             // Anagrafica admin
             'first_name' => ['required', 'string', 'max:100'],

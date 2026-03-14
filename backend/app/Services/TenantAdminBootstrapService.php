@@ -50,8 +50,7 @@ class TenantAdminBootstrapService
      *   tenant_id?: int,
      *   tenant_name?: string,
      *   tenant_slug?: string,
-     *   contract_reference: string,
-     *   contract_date?: string,
+     *   contract_id?: int,
      *   first_name: string,
      *   last_name: string,
      *   email: string,
@@ -87,8 +86,7 @@ class TenantAdminBootstrapService
                 'system_project_id'  => $data['system_project_id'],
                 'tenant_id'          => $tenant->id,
                 'user_id'            => $user->id,
-                'contract_reference' => $data['contract_reference'],
-                'contract_date'      => $data['contract_date'] ?? null,
+                'contract_id'         => $data['contract_id'] ?? null,
                 'first_name_snapshot' => $data['first_name'],
                 'last_name_snapshot'  => $data['last_name'],
                 'email_snapshot'      => $data['email'],
@@ -203,7 +201,7 @@ class TenantAdminBootstrapService
                         'assigned_by' => $bootstrap->created_by,
                         'assigned_at' => now(),
                         'is_active'   => true,
-                        'notes'       => 'Creato da bootstrap ' . $bootstrap->id . ' (contratto: ' . $bootstrap->contract_reference . ')',
+                        'notes'       => 'Creato da bootstrap #' . $bootstrap->id,
                     ]);
 
                     $this->logger->info('TenantAdminBootstrap: ruolo ProjectAdmin assegnato', [

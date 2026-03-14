@@ -55,8 +55,7 @@ class TenantAdminBootstrapController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('email_snapshot', 'like', "%{$search}%")
                       ->orWhere('first_name_snapshot', 'like', "%{$search}%")
-                      ->orWhere('last_name_snapshot', 'like', "%{$search}%")
-                      ->orWhere('contract_reference', 'like', "%{$search}%");
+                      ->orWhere('last_name_snapshot', 'like', "%{$search}%");
                 });
             }
 
