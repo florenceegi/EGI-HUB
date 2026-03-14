@@ -60,8 +60,6 @@ export default function CreateBootstrap() {
     tenant_id: string;
     tenant_name: string;
     tenant_slug: string;
-    contract_reference: string;
-    contract_date: string;
     first_name: string;
     last_name: string;
     email: string;
@@ -75,8 +73,6 @@ export default function CreateBootstrap() {
     tenant_id: '',
     tenant_name: '',
     tenant_slug: '',
-    contract_reference: '',
-    contract_date: '',
     first_name: '',
     last_name: '',
     email: '',
@@ -121,7 +117,6 @@ export default function CreateBootstrap() {
     const errors: Record<string, string> = {};
 
     if (!form.system_project_id) errors.system_project_id = 'Seleziona un progetto';
-    if (!form.contract_reference.trim()) errors.contract_reference = 'Campo obbligatorio';
     if (!form.first_name.trim()) errors.first_name = 'Campo obbligatorio';
     if (!form.last_name.trim()) errors.last_name = 'Campo obbligatorio';
     if (!form.email.trim()) {
@@ -156,7 +151,6 @@ export default function CreateBootstrap() {
     const payload: CreateBootstrapPayload = {
       system_project_id: parseInt(form.system_project_id, 10),
       tenant_mode: form.tenant_mode,
-      contract_reference: form.contract_reference.trim(),
       first_name: form.first_name.trim(),
       last_name: form.last_name.trim(),
       email: form.email.trim(),
@@ -170,7 +164,6 @@ export default function CreateBootstrap() {
       payload.tenant_id = parseInt(form.tenant_id, 10);
     }
 
-    if (form.contract_date) payload.contract_date = form.contract_date;
     if (form.phone.trim()) payload.phone = form.phone.trim();
     if (form.job_title.trim()) payload.job_title = form.job_title.trim();
     if (form.notes.trim()) payload.notes = form.notes.trim();
@@ -376,14 +369,12 @@ export default function CreateBootstrap() {
           </div>
         </div>
 
-        {/* Section: Contratto */}
+        {/* Section: Note */}
         <ContractFields
           values={{
-            contract_reference: form.contract_reference,
-            contract_date: form.contract_date,
             notes: form.notes,
           }}
-          errors={{ contract_reference: fieldErrors.contract_reference }}
+          errors={{}}
           onChange={set}
         />
 

@@ -304,12 +304,10 @@ export default function BootstrapsList() {
                     {b.tenant?.name ?? <span className="text-base-content/40">—</span>}
                   </td>
                   <td>
-                    <div className="font-mono text-sm">{b.contract_reference}</div>
-                    {b.contract_date && (
-                      <div className="text-xs text-base-content/50">
-                        {new Date(b.contract_date).toLocaleDateString('it-IT')}
-                      </div>
-                    )}
+                    {b.contract_id
+                      ? <span className="badge badge-outline badge-sm">#{b.contract_id}</span>
+                      : <span className="text-base-content/40">—</span>
+                    }
                   </td>
                   <td>
                     <div className="font-medium">
@@ -377,7 +375,7 @@ export default function BootstrapsList() {
                                 setActionPending({
                                   type: 'suspend',
                                   bootstrapId: b.id,
-                                  bootstrapRef: b.contract_reference,
+                                  bootstrapRef: b.email_snapshot,
                                 })
                               }
                             >
@@ -393,7 +391,7 @@ export default function BootstrapsList() {
                                 setActionPending({
                                   type: 'revoke',
                                   bootstrapId: b.id,
-                                  bootstrapRef: b.contract_reference,
+                                  bootstrapRef: b.email_snapshot,
                                 })
                               }
                             >

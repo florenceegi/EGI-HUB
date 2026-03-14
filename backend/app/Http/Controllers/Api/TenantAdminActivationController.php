@@ -66,13 +66,26 @@ class TenantAdminActivationController extends Controller
             return response()->json([
                 'success' => true,
                 'data'    => [
-                    'first_name'         => $bootstrap->first_name_snapshot,
-                    'last_name'          => $bootstrap->last_name_snapshot,
-                    'email'              => $bootstrap->email_snapshot,
-                    'tenant_name'        => $bootstrap->tenant->name ?? null,
-                    'project_name'       => $bootstrap->project->name ?? null,
-                    'contract_reference' => $bootstrap->contract_reference,
-                    'expires_at'         => $bootstrap->invitation_expires_at?->toIso8601String(),
+                    'bootstrap' => [
+                        'id'                    => $bootstrap->id,
+                        'status'                => $bootstrap->status instanceof \App\Enums\BootstrapStatus
+                            ? $bootstrap->status->value
+                            : $bootstrap->status,
+                        'first_name_snapshot'   => $bootstrap->first_name_snapshot,
+                        'last_name_snapshot'    => $bootstrap->last_name_snapshot,
+                        'email_snapshot'        => $bootstrap->email_snapshot,
+                        'invitation_expires_at' => $bootstrap->invitation_expires_at?->toIso8601String(),
+                    ],
+                    'project' => $bootstrap->project ? [
+                        'id'   => $bootstrap->project->id,
+                        'name' => $bootstrap->project->name,
+                        'slug' => $bootstrap->project->slug,
+                    ] : null,
+                    'tenant' => $bootstrap->tenant ? [
+                        'id'   => $bootstrap->tenant->id,
+                        'name' => $bootstrap->tenant->name,
+                        'slug' => $bootstrap->tenant->slug,
+                    ] : null,
                 ],
             ]);
         } catch (\Exception $e) {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Building2, ArrowLeft, Send, Users, FileText, CheckCircle } from 'lucide-react';
+import { Building2, ArrowLeft, Send, Users, CheckCircle } from 'lucide-react';
 import { useProject } from '@/contexts/ProjectContext';
 import { createBootstrap } from '@/services/bootstrapApi';
 
@@ -18,8 +18,6 @@ export default function ProjectCreateTenant() {
   const [formData, setFormData] = useState({
     tenant_name: '',
     tenant_slug: '',
-    contract_reference: '',
-    contract_date: '',
     first_name: '',
     last_name: '',
     email: '',
@@ -57,8 +55,6 @@ export default function ProjectCreateTenant() {
         tenant_mode: 'create_new',
         tenant_name: formData.tenant_name,
         tenant_slug: formData.tenant_slug,
-        contract_reference: formData.contract_reference,
-        contract_date: formData.contract_date || undefined,
         first_name: formData.first_name,
         last_name: formData.last_name,
         email: formData.email,
@@ -166,41 +162,6 @@ export default function ProjectCreateTenant() {
           </div>
         </div>
 
-        {/* Contract */}
-        <div className="card bg-base-100 shadow-sm">
-          <div className="card-body">
-            <h2 className="card-title text-lg mb-4">
-              <FileText className="w-5 h-5" />
-              Riferimento Contrattuale
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-medium">Numero Contratto *</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="es. CNTR-2026-001"
-                  className="input input-bordered"
-                  value={formData.contract_reference}
-                  onChange={(e) => handleChange('contract_reference', e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-medium">Data Contratto</span>
-                </label>
-                <input
-                  type="date"
-                  className="input input-bordered"
-                  value={formData.contract_date}
-                  onChange={(e) => handleChange('contract_date', e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Admin */}
         <div className="card bg-base-100 shadow-sm">

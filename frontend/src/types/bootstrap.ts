@@ -12,8 +12,7 @@ export interface TenantAdminBootstrap {
   system_project_id: number;
   tenant_id: number;
   user_id: number | null;
-  contract_reference: string;
-  contract_date: string | null;
+  contract_id: number | null;
   first_name_snapshot: string;
   last_name_snapshot: string;
   email_snapshot: string;
@@ -40,8 +39,7 @@ export interface CreateBootstrapPayload {
   tenant_id?: number;
   tenant_name?: string;
   tenant_slug?: string;
-  contract_reference: string;
-  contract_date?: string;
+  contract_id?: number;
   first_name: string;
   last_name: string;
   email: string;

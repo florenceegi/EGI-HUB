@@ -55,8 +55,7 @@ class TenantAdminInvitationMail extends Mailable
                 'adminLastName'       => $this->bootstrap->last_name_snapshot,
                 'tenantName'          => $this->bootstrap->tenant->name ?? 'Tenant',
                 'projectName'         => $this->bootstrap->project->name ?? 'Progetto',
-                'contractReference'   => $this->bootstrap->contract_reference,
-                'activationUrl'       => url('/activate/tenant-admin/' . $this->token),
+                'activationUrl'       => rtrim($this->bootstrap->project->url ?? config('app.url'), '/') . '/activate/tenant-admin/' . $this->token,
                 'expiresAt'           => $this->bootstrap->invitation_expires_at,
             ],
         );

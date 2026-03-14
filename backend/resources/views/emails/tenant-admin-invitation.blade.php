@@ -110,7 +110,6 @@
             <div class="info-box">
                 <p><strong>Tenant:</strong> {{ $tenantName }}</p>
                 <p><strong>Progetto:</strong> {{ $projectName }}</p>
-                <p><strong>Riferimento contratto:</strong> {{ $contractReference }}</p>
             </div>
 
             <p>

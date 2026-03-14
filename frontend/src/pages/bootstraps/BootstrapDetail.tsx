@@ -231,9 +231,9 @@ export default function BootstrapDetail() {
             </h1>
             <div className="flex items-center gap-2 mt-1">
               <BootstrapStatusBadge status={bootstrap.status} />
-              <span className="text-base-content/60 text-sm font-mono">
-                {bootstrap.contract_reference}
-              </span>
+              {bootstrap.contract_id && (
+                <span className="text-base-content/60 text-sm font-mono">Contratto #{bootstrap.contract_id}</span>
+              )}
             </div>
           </div>
         </div>
@@ -333,13 +333,7 @@ export default function BootstrapDetail() {
                 ? <span className="font-mono text-xs">{bootstrap.tenant.slug}</span>
                 : null}
             />
-            <InfoRow label="Rif. Contratto" value={bootstrap.contract_reference} />
-            <InfoRow
-              label="Data Contratto"
-              value={bootstrap.contract_date
-                ? new Date(bootstrap.contract_date).toLocaleDateString('it-IT')
-                : null}
-            />
+            <InfoRow label="Contratto ID" value={bootstrap.contract_id ? `#${bootstrap.contract_id}` : null} />
           </div>
         </div>
 
