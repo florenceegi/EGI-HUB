@@ -152,6 +152,13 @@ const getProjectMenuGroups = (projectSlug: string): MenuGroup[] => [
     ],
   },
   {
+    name: 'Contratti',
+    icon: <FileText className="w-5 h-5" />,
+    items: [
+      { name: 'Contratti Progetto', path: `/project/${projectSlug}/contracts`, icon: <FileText className="w-4 h-4" /> },
+    ],
+  },
+  {
     name: 'Configurazione',
     icon: <Settings className="w-5 h-5" />,
     items: [

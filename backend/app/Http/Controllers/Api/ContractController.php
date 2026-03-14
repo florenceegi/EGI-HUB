@@ -9,6 +9,7 @@ use App\Enums\ContractType;
 use App\Enums\BillingPeriod;
 use App\Http\Controllers\Controller;
 use App\Models\Contract;
+use App\Models\Project;
 use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -42,6 +43,72 @@ class ContractController extends Controller
             'data'    => $contracts,
             'tenant'  => ['id' => $tenant->id, 'name' => $tenant->name],
         ]);
+    }
+
+    /**
+     * Lista contratti a livello di progetto (tenant_id IS NULL)
+     * GET /api/admin/projects/{projectId}/contracts
+     */
+    public function indexByProject(int $projectId): JsonResponse
+    {
+        $project = Project::findOrFail($projectId);
+
+        $contracts = Contract::forProject($projectId)
+            ->whereNull('tenant_id')
+            ->with(['createdBy:id,name,email', 'parentContract:id,contract_number'])
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn(Contract $c) => $this->formatContract($c));
+
+        return response()->json([
+            'success' => true,
+            'data'    => $contracts,
+            'project' => ['id' => $project->id, 'name' => $project->name, 'slug' => $project->slug],
+        ]);
+    }
+
+    /**
+     * Crea contratto a livello di progetto (verticalizzazione, sviluppo custom)
+     * POST /api/admin/projects/{projectId}/contracts
+     */
+    public function storeForProject(Request $request, int $projectId): JsonResponse
+    {
+        $project = Project::findOrFail($projectId);
+
+        $validator = Validator::make($request->all(), [
+            'contract_type'      => 'required|in:' . implode(',', ContractType::projectTypes()),
+            'signatory_name'     => 'required|string|max:255',
+            'signatory_email'    => 'required|email|max:255',
+            'signatory_role'     => 'nullable|string|max:255',
+            'signatory_is_admin' => 'boolean',
+            'signed_at'          => 'nullable|date',
+            'value'              => 'nullable|numeric|min:0',
+            'currency'           => 'nullable|string|size:3',
+            'billing_period'     => 'nullable|in:monthly,annual,one_time,custom',
+            'start_date'         => 'required|date',
+            'end_date'           => 'nullable|date|after:start_date',
+            'document_url'       => 'nullable|url|max:1000',
+            'notes'              => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $data = $validator->validated();
+        $data['system_project_id'] = $projectId;
+        $data['tenant_id']         = null;
+        $data['status']            = ContractStatus::Draft->value;
+        $data['contract_number']   = Contract::generateContractNumber($projectId);
+        $data['created_by']        = $request->user()->id;
+
+        $contract = Contract::create($data);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $this->formatContract($contract->fresh()),
+            'message' => 'Contratto progetto creato — numero: ' . $contract->contract_number,
+        ], 201);
     }
 
     /**

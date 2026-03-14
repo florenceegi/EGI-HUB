@@ -56,6 +56,7 @@ import ProjectDashboard from './pages/projects/ProjectDashboard'
 import ProjectTenantsList from './pages/projects/ProjectTenantsList'
 import ProjectCreateTenant from './pages/projects/ProjectCreateTenant'
 import ProjectCreateAdminBootstrap from './pages/projects/ProjectCreateAdminBootstrap'
+import ProjectContracts from './pages/projects/ProjectContracts'
 
 import TwoFactorChallenge from './pages/auth/2fa/TwoFactorChallenge'
 
@@ -206,6 +207,7 @@ function AppRoutes() {
         <Route path="project/:slug/tenants/create" element={<ProjectCreateTenant />} />
         <Route path="project/:slug/tenants/:tenantId/admin/create" element={<ProjectCreateAdminBootstrap />} />
         <Route path="project/:slug/tenants/:tenantId/contracts" element={<TenantContracts />} />
+        <Route path="project/:slug/contracts" element={<ProjectContracts />} />
         
         {/* Project Settings */}
         <Route path="project/:slug/settings" element={<ComingSoon title="Impostazioni Progetto" />} />

@@ -13,18 +13,32 @@ namespace App\Enums;
  */
 enum ContractType: string
 {
-    case Saas   = 'saas';
-    case Pilot  = 'pilot';
-    case Trial  = 'trial';
-    case Custom = 'custom';
+    case Saas               = 'saas';
+    case Pilot              = 'pilot';
+    case Trial              = 'trial';
+    case Custom             = 'custom';
+    case Verticalizzazione  = 'verticalizzazione';
 
     public function label(): string
     {
         return match($this) {
-            self::Saas   => 'SaaS',
-            self::Pilot  => 'Pilota',
-            self::Trial  => 'Trial',
-            self::Custom => 'Personalizzato',
+            self::Saas              => 'SaaS',
+            self::Pilot             => 'Pilota',
+            self::Trial             => 'Trial',
+            self::Custom            => 'Personalizzato',
+            self::Verticalizzazione => 'Verticalizzazione',
         };
+    }
+
+    /** Tipi validi per contratti a livello di Tenant */
+    public static function tenantTypes(): array
+    {
+        return [self::Saas->value, self::Pilot->value, self::Trial->value, self::Custom->value];
+    }
+
+    /** Tipi validi per contratti a livello di Progetto */
+    public static function projectTypes(): array
+    {
+        return [self::Verticalizzazione->value, self::Custom->value];
     }
 }

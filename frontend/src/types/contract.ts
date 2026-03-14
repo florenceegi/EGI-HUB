@@ -4,7 +4,7 @@
  */
 
 export type ContractStatus = 'draft' | 'active' | 'expired' | 'terminated' | 'renewed';
-export type ContractType   = 'saas' | 'pilot' | 'trial' | 'custom';
+export type ContractType   = 'saas' | 'pilot' | 'trial' | 'custom' | 'verticalizzazione';
 export type BillingPeriod  = 'monthly' | 'annual' | 'one_time' | 'custom';
 
 export const CONTRACT_STATUS_LABELS: Record<ContractStatus, string> = {
@@ -24,11 +24,17 @@ export const CONTRACT_STATUS_COLORS: Record<ContractStatus, string> = {
 };
 
 export const CONTRACT_TYPE_LABELS: Record<ContractType, string> = {
-  saas:   'SaaS',
-  pilot:  'Pilota',
-  trial:  'Trial',
-  custom: 'Personalizzato',
+  saas:             'SaaS',
+  pilot:            'Pilota',
+  trial:            'Trial',
+  custom:           'Personalizzato',
+  verticalizzazione:'Verticalizzazione',
 };
+
+/** Tipi contratto validi per livello tenant */
+export const TENANT_CONTRACT_TYPES: ContractType[] = ['saas', 'pilot', 'trial', 'custom'];
+/** Tipi contratto validi per livello progetto */
+export const PROJECT_CONTRACT_TYPES: ContractType[] = ['verticalizzazione', 'custom'];
 
 export const BILLING_PERIOD_LABELS: Record<BillingPeriod, string> = {
   monthly:  'Mensile',
@@ -98,6 +104,22 @@ export interface Contract {
 
 export interface CreateContractData {
   system_project_id: number;
+  contract_type: ContractType;
+  signatory_name: string;
+  signatory_email: string;
+  signatory_role?: string;
+  signatory_is_admin?: boolean;
+  signed_at?: string;
+  value?: number;
+  currency?: string;
+  billing_period?: BillingPeriod;
+  start_date: string;
+  end_date?: string;
+  document_url?: string;
+  notes?: string;
+}
+
+export interface CreateProjectContractData {
   contract_type: ContractType;
   signatory_name: string;
   signatory_email: string;

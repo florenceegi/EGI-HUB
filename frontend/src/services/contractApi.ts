@@ -4,7 +4,7 @@
  */
 
 import api from './api';
-import type { Contract, CreateContractData, RenewContractData } from '../types/contract';
+import type { Contract, CreateContractData, CreateProjectContractData, RenewContractData } from '../types/contract';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -54,6 +54,21 @@ export async function renewContract(id: number, data?: RenewContractData): Promi
 
 export async function deleteContract(id: number): Promise<void> {
   await api.delete(`/contracts/${id}`);
+}
+
+export async function getContractsByProject(projectId: number): Promise<{
+  data: Contract[];
+  project: { id: number; name: string; slug: string };
+}> {
+  const res = await api.get<{ success: boolean; data: Contract[]; project: { id: number; name: string; slug: string } }>(
+    `/admin/projects/${projectId}/contracts`
+  );
+  return { data: res.data.data, project: res.data.project };
+}
+
+export async function createProjectContract(projectId: number, data: CreateProjectContractData): Promise<Contract> {
+  const res = await api.post<ApiResponse<Contract>>(`/admin/projects/${projectId}/contracts`, data);
+  return res.data.data;
 }
 
 export const contractApi = {

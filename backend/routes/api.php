@@ -354,9 +354,14 @@ Route::middleware(['auth:sanctum', 'ensure.2fa', 'super.admin'])->group(function
     });
 
     // ── Contracts ──────────────────────────────────────────────────────────────
-    Route::prefix('tenants/{tenantId}/contracts')->name('contracts.')->group(function () {
+    Route::prefix('tenants/{tenantId}/contracts')->name('contracts.tenant.')->group(function () {
         Route::get('/',    [ContractController::class, 'index'])->name('index');
         Route::post('/',   [ContractController::class, 'store'])->name('store');
+    });
+
+    Route::prefix('admin/projects/{projectId}/contracts')->name('contracts.project.')->group(function () {
+        Route::get('/',    [ContractController::class, 'indexByProject'])->name('index');
+        Route::post('/',   [ContractController::class, 'storeForProject'])->name('store');
     });
 
     Route::prefix('contracts')->name('contracts.')->group(function () {
