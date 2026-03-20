@@ -36,28 +36,29 @@ Questo vale in EGI, in NATAN_LOC, in ogni organo futuro. Senza eccezioni.
 
 ---
 
-## 🚨 TRAPPOLA CRITICA — egili_amount NON È EGILI
+## 🎁 Egili — Premio di Partecipazione all'Ecosistema
 
 ```
-ATTENZIONE: il campo feature_parameters.egili_amount NON rappresenta Egili.
-Rappresenta Token AI (il prodotto user-facing che l'utente compra).
+Egili = punti premio dell'ecosistema FlorenceEGI.
+ZERO valore monetario. ZERO conversione EUR. ZERO legame con i prezzi.
 
-FLUSSO CORRETTO:
-  feature_parameters.egili_amount  = Token AI (face value, cosa l'utente vede e compra)
-  egili_credit_ratio                = 0.80 (da PlatformSetting 'ai_credits', 'egili_credit_ratio')
-  Egili accreditati al wallet       = egili_amount × egili_credit_ratio
+Si guadagnano in molti modi:
+  - Acquisto pacchetti Token LLM   → egili_gift (SSOT su ai_feature_pricing)
+  - Referral di un Creator         → X Egili
+  - Vendita di un EGI              → X Egili
+  - Contributo a un EPP            → X Egili
+  - [decine di altri meccanismi futuri]
 
-ESEMPIO:
-  egili_amount = 1000 Token AI
-  × 0.80 ratio
-  = 800 Egili nel wallet
+Quando finiscono = ENGAGEMENT WALL (non paywall):
+  "Hai esaurito i tuoi contributi, torna a partecipare all'ecosistema"
 
-DOVE VIVE IL RATIO:
-  PlatformSetting::get('ai_credits', 'egili_credit_ratio', 0.8)
-  Tabella condivisa nel DB — stessa per EGI e NATAN_LOC.
+SSOT definitivo:
+  ai_tokens_included (colonna)  = Token LLM inclusi nel pacchetto (prodotto user-facing)
+  egili_gift (colonna)          = Egili regalati all'acquisto (scritto dall'admin, letto dal sistema)
+  egili_credit_ratio            = Check interno di sicurezza SOLO — NON usato per calcoli user-facing
 
-SE VEDI egili_amount → NON assumere che siano Egili da accreditare 1:1.
-SE VEDI egili_amount → È TOKEN AI. La conversione va sempre applicata.
+MAI creare: eur_per_egili, egili_to_eur_rate, fromEur(), toEur()
+            o qualsiasi rate che converta Egili in EUR o viceversa → VIOLA MiCA
 ```
 
 ---
@@ -100,6 +101,15 @@ P0-5 UEM-First · P0-8 Complete Flow Analysis · P0-9 i18n 6 lingue
 
 SSOT documentazione EGI-HUB: `/home/fabio/EGI-DOC/docs/egi-hub/`
 SSOT Ecosistema: `/home/fabio/EGI-DOC/docs/ecosistema/`
+
+---
+
+## 🔒 Valori Immutabili — MAI toccare senza approvazione esplicita di Fabio
+
+```
+tokens_per_egili  = 1250   # Token LLM per singolo Egili (ecosistema)
+egili_per_query   = 44     # Egili consumati per query standard
+```
 
 ---
 
