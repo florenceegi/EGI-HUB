@@ -10,22 +10,26 @@ use Illuminate\Support\Facades\DB;
 /**
  * @package Database\Seeders
  * @author Padmin D. Curtis (AI Partner OS3.0) for Fabio Cherici
- * @version 2.0.0 (FlorenceEGI - NATAN LOC Query Packages)
+ * @version 2.1.0 (FlorenceEGI - NATAN LOC Query Packages)
  * @date 2026-03-20
  * @purpose Inserisce i pacchetti Token AI per NATAN_LOC nella tabella ai_feature_pricing.
  *
- *          SEMANTICA CORRETTA (allineata a EGI):
- *          feature_parameters.egili_amount = Token AI (prodotto user-facing, MiCA-safe)
- *          Egili accreditati al wallet      = egili_amount × egili_credit_ratio (0.80)
+ *          SEMANTICA MiCA-SAFE (v2.1.0):
+ *          ai_tokens_included (colonna)     = Token AI — SSOT del prodotto user-facing
+ *          feature_parameters               = solo metadati display: approx_queries, token_unit, platform
+ *          Egili accreditati al wallet      = ai_tokens_included × egili_credit_ratio (runtime)
  *          egili_credit_ratio da PlatformSetting 'ai_credits','egili_credit_ratio'
  *
- *          ESEMPIO: NATAN Token 1.000 → utente compra 1000 Token AI → riceve 800 Egili
+ *          MAI scrivere egili_amount o egili_credited su DB — rischio MiCA.
+ *          Il valore "Premio Egili" è CALCOLATO a runtime, mai persistito.
+ *
+ *          ESEMPIO: NATAN Token 1.000 → utente compra 1000 Token AI → riceve 800 Egili (calc runtime)
  *
  *          Query stimate su Egili ricevuti (÷ 70 Egili/query media NATAN):
- *          1000 Token AI → 800 Egili → ~11 query
- *          2500 Token AI → 2000 Egili → ~28 query
- *          6250 Token AI → 5000 Egili → ~71 query
- *          12500 Token AI → 10000 Egili → ~142 query
+ *          1000 Token AI → ~11 query
+ *          2500 Token AI → ~28 query
+ *          6250 Token AI → ~71 query
+ *          12500 Token AI → ~142 query
  *
  *          PREZZI non impostati — is_active=false — attivare via EGI-HUB Superadmin dopo pricing.
  */
@@ -45,8 +49,9 @@ class NatanLocQueryPackagesSeeder extends Seeder
             [
                 'feature_code'        => 'natan_loc_token_1000',
                 'feature_name'        => 'NATAN Token 1.000',
-                'feature_description' => 'Pacchetto 1.000 Token AI per NATAN LOC — ideale per uso occasionale. Credita 800 Egili al wallet. Consente circa 11 query tipiche al sistema documentale AI.',
+                'feature_description' => 'Pacchetto 1.000 Token AI per NATAN LOC — ideale per uso occasionale. Premio Egili calcolato runtime. Consente circa 11 query tipiche al sistema documentale AI.',
                 'feature_category'    => 'natan_loc',
+                'ai_tokens_included'  => 1000,   // SSOT Token AI — letto da colonna, non da feature_parameters
                 'cost_fiat_eur'       => null,   // ⚠️ DA IMPOSTARE via EGI-HUB Superadmin
                 'cost_egili'          => 0,       // Acquistato con EUR, non con Egili
                 'is_free'             => false,
@@ -62,10 +67,8 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'is_featured'         => false,
                 'display_order'       => 100,
                 'feature_parameters'  => json_encode([
-                    'egili_amount'    => 1000,   // Token AI venduti (user-facing)
-                    'egili_credited'  => 800,    // Egili al wallet (egili_amount × 0.80)
+                    'approx_queries'  => 11,     // stima: (1000 × 0.80) ÷ 70 Egili/query
                     'token_unit'      => 'Token AI',
-                    'approx_queries'  => 11,     // 800 Egili ÷ 70 Egili/query
                     'platform'        => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
@@ -76,14 +79,15 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 ]),
                 'metadata' => json_encode([
                     'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.0.0',
+                    'version'    => '2.1.0',
                 ]),
             ],
             [
                 'feature_code'        => 'natan_loc_token_2500',
                 'feature_name'        => 'NATAN Token 2.500',
-                'feature_description' => 'Pacchetto 2.500 Token AI per NATAN LOC — uso regolare. Credita 2.000 Egili al wallet. Consente circa 28 query tipiche al sistema documentale AI.',
+                'feature_description' => 'Pacchetto 2.500 Token AI per NATAN LOC — uso regolare. Premio Egili calcolato runtime. Consente circa 28 query tipiche al sistema documentale AI.',
                 'feature_category'    => 'natan_loc',
+                'ai_tokens_included'  => 2500,
                 'cost_fiat_eur'       => null,
                 'cost_egili'          => 0,
                 'is_free'             => false,
@@ -99,10 +103,8 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'is_featured'         => true,   // Scelta consigliata
                 'display_order'       => 110,
                 'feature_parameters'  => json_encode([
-                    'egili_amount'    => 2500,
-                    'egili_credited'  => 2000,   // 2500 × 0.80
+                    'approx_queries'  => 28,     // stima: (2500 × 0.80) ÷ 70 Egili/query
                     'token_unit'      => 'Token AI',
-                    'approx_queries'  => 28,     // 2000 ÷ 70
                     'platform'        => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
@@ -114,14 +116,15 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 ]),
                 'metadata' => json_encode([
                     'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.0.0',
+                    'version'    => '2.1.0',
                 ]),
             ],
             [
                 'feature_code'        => 'natan_loc_token_6250',
                 'feature_name'        => 'NATAN Token 6.250',
-                'feature_description' => 'Pacchetto 6.250 Token AI per NATAN LOC — uso intensivo. Credita 5.000 Egili al wallet. Consente circa 71 query tipiche al sistema documentale AI.',
+                'feature_description' => 'Pacchetto 6.250 Token AI per NATAN LOC — uso intensivo. Premio Egili calcolato runtime. Consente circa 71 query tipiche al sistema documentale AI.',
                 'feature_category'    => 'natan_loc',
+                'ai_tokens_included'  => 6250,
                 'cost_fiat_eur'       => null,
                 'cost_egili'          => 0,
                 'is_free'             => false,
@@ -137,10 +140,8 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'is_featured'         => false,
                 'display_order'       => 120,
                 'feature_parameters'  => json_encode([
-                    'egili_amount'    => 6250,
-                    'egili_credited'  => 5000,   // 6250 × 0.80
+                    'approx_queries'  => 71,     // stima: (6250 × 0.80) ÷ 70 Egili/query
                     'token_unit'      => 'Token AI',
-                    'approx_queries'  => 71,     // 5000 ÷ 70
                     'platform'        => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
@@ -152,14 +153,15 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 ]),
                 'metadata' => json_encode([
                     'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.0.0',
+                    'version'    => '2.1.0',
                 ]),
             ],
             [
                 'feature_code'        => 'natan_loc_token_12500',
                 'feature_name'        => 'NATAN Token 12.500',
-                'feature_description' => 'Pacchetto 12.500 Token AI per NATAN LOC — uso enterprise. Credita 10.000 Egili al wallet. Consente circa 142 query tipiche al sistema documentale AI.',
+                'feature_description' => 'Pacchetto 12.500 Token AI per NATAN LOC — uso enterprise. Premio Egili calcolato runtime. Consente circa 142 query tipiche al sistema documentale AI.',
                 'feature_category'    => 'natan_loc',
+                'ai_tokens_included'  => 12500,
                 'cost_fiat_eur'       => null,
                 'cost_egili'          => 0,
                 'is_free'             => false,
@@ -175,10 +177,8 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'is_featured'         => false,
                 'display_order'       => 130,
                 'feature_parameters'  => json_encode([
-                    'egili_amount'    => 12500,
-                    'egili_credited'  => 10000,  // 12500 × 0.80
+                    'approx_queries'  => 142,    // stima: (12500 × 0.80) ÷ 70 Egili/query
                     'token_unit'      => 'Token AI',
-                    'approx_queries'  => 142,    // 10000 ÷ 70
                     'platform'        => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
@@ -191,7 +191,7 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 ]),
                 'metadata' => json_encode([
                     'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.0.0',
+                    'version'    => '2.1.0',
                 ]),
             ],
         ];
@@ -206,8 +206,10 @@ class NatanLocQueryPackagesSeeder extends Seeder
             );
         }
 
-        $this->command->info('✓ NatanLoc query packages seeded v2.0.0 (4 packages, is_active=false)');
-        $this->command->info('  Token AI → Egili: ×0.80 (egili_credit_ratio da PlatformSetting)');
-        $this->command->warn('  ⚠️  Imposta i prezzi (cost_fiat_eur) e attiva (is_active=true) via EGI-HUB Superadmin');
+        $this->command->info('NatanLoc query packages seeded v2.1.0 (4 packages, is_active=false)');
+        $this->command->info('  SSOT Token AI: colonna ai_tokens_included (NON feature_parameters)');
+        $this->command->info('  Premio Egili: calcolato runtime (ai_tokens_included x egili_credit_ratio) — MAI su DB');
+        $this->command->info('  feature_parameters contiene solo: approx_queries, token_unit, platform');
+        $this->command->warn('  Imposta i prezzi (cost_fiat_eur) e attiva (is_active=true) via EGI-HUB Superadmin');
     }
 }
