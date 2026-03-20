@@ -6,6 +6,36 @@
 
 ---
 
+## ⚠️ LEGGE FONDAMENTALE DELL'ECOSISTEMA — P0 ASSOLUTO
+
+```
+EGI, NATAN_LOC, EGI-HUB sono progetti diversi MA parte di un unico ecosistema.
+Una decisione tecnica in EGI-HUB può avere impatto su EGI e NATAN_LOC e viceversa.
+
+PRIMA di qualsiasi modifica che riguardi:
+  - Egili / Token AI / wallet / transazioni
+  - Nomi di campi condivisi (egili_amount, token_amount, ...)
+  - Logiche di conversione / tassi / margini
+  - Tabelle condivise (ai_feature_pricing, wallets, egili_transactions)
+  - Pattern MiCA-safe
+
+→ STOP. Verificare come gli altri organi implementano la stessa cosa.
+→ MAI dedurre che "negli altri progetti è diverso" senza aver letto il codice.
+→ MAI cambiare un nome di campo senza verificare tutte le occorrenze nell'ecosistema.
+→ MAI implementare una logica (es. conversione Token→Egili) senza capire
+   come è già implementata negli altri organi.
+
+Percorso EGI:       /home/fabio/EGI/
+Percorso NATAN_LOC: /home/fabio/NATAN_LOC/
+```
+
+**MiCA-SAFE è una legge dell'ecosistema, non solo di EGI-HUB.**
+Gli Egili NON si vendono mai direttamente. Si vende sempre un prodotto/servizio
+(es. Token AI, abbonamento, pacchetto), e l'utente RICEVE Egili come credito interno.
+Questo vale in EGI, in NATAN_LOC, in ogni organo futuro. Senza eccezioni.
+
+---
+
 ## 🌐 OSZ — EGI-HUB è il Centro di Comando dell'Organismo
 
 ```
@@ -40,6 +70,7 @@ CONFIG LEGACY in organi esistenti    → resta dove è. Si migra solo quando si 
 P0-1 REGOLA ZERO · P0-2 Translation keys · P0-4 Anti-Method-Invention
 P0-5 UEM-First · P0-8 Complete Flow Analysis · P0-9 i18n 6 lingue
 **P0-11 DOC-SYNC** — task non chiusa senza EGI-DOC aggiornato.
+**P0-12 Anti-Infra-Invention** — qualsiasi info di deploy/infrastruttura (URL, path EC2, branch) va verificata dalla fonte reale — SSM `ls`, `git remote -v`, `git branch` — MAI copiata da altri file o dedotta dal nome del progetto.
 
 SSOT documentazione EGI-HUB: `/home/fabio/EGI-DOC/docs/egi-hub/`
 SSOT Ecosistema: `/home/fabio/EGI-DOC/docs/ecosistema/`
@@ -213,6 +244,7 @@ Prima di chiudere ogni task, classifica la modifica:
 4. Search_path è core,public?           → NO  = 🛑 VERIFICA (mai schema natan)
 5. Tipo modifica → [1-6]?               → ?   = classifica con Trigger Matrix sopra
 6. DOC-SYNC eseguito (se Tipo 2+)?      → NO  = 🛑 NON CHIUDERE (P0-11)
+7. Info deploy/infra scritte o usate?  → SÌ  = 🛑 VERIFICA da SSM/git, MAI dedurre (P0-12)
 ```
 
 ## ⚡ Comandi Verifica Rapida
@@ -282,6 +314,21 @@ aws ssm get-command-invocation \
 ```
 
 > `public/build/` in `.gitignore` → rebuilda sempre dopo pull se tocchi TS/CSS/TSX
+
+### Pipeline Post-Commit — OBBLIGATORIA E AUTOMATICA
+
+Dopo ogni `git commit`, **senza aspettare istruzioni**, eseguire sempre nell'ordine:
+
+```
+1. git push origin main
+2. SSM Step 1 (SEMPRE): git pull + php artisan migrate --force + config:cache + view:clear
+3. SSM Step 2 (se modificati file TS/CSS/TSX): npm run build frontend
+4. Verificare output SSM (Status: Success)
+```
+
+**Nessuna eccezione. Nessuna richiesta di conferma. Il deploy è parte del commit.**
+
+Se il deploy SSM fallisce → riportare l'errore immediatamente e bloccarsi.
 
 ---
 
