@@ -36,6 +36,32 @@ Questo vale in EGI, in NATAN_LOC, in ogni organo futuro. Senza eccezioni.
 
 ---
 
+## 🚨 TRAPPOLA CRITICA — egili_amount NON È EGILI
+
+```
+ATTENZIONE: il campo feature_parameters.egili_amount NON rappresenta Egili.
+Rappresenta Token AI (il prodotto user-facing che l'utente compra).
+
+FLUSSO CORRETTO:
+  feature_parameters.egili_amount  = Token AI (face value, cosa l'utente vede e compra)
+  egili_credit_ratio                = 0.80 (da PlatformSetting 'ai_credits', 'egili_credit_ratio')
+  Egili accreditati al wallet       = egili_amount × egili_credit_ratio
+
+ESEMPIO:
+  egili_amount = 1000 Token AI
+  × 0.80 ratio
+  = 800 Egili nel wallet
+
+DOVE VIVE IL RATIO:
+  PlatformSetting::get('ai_credits', 'egili_credit_ratio', 0.8)
+  Tabella condivisa nel DB — stessa per EGI e NATAN_LOC.
+
+SE VEDI egili_amount → NON assumere che siano Egili da accreditare 1:1.
+SE VEDI egili_amount → È TOKEN AI. La conversione va sempre applicata.
+```
+
+---
+
 ## 🌐 OSZ — EGI-HUB è il Centro di Comando dell'Organismo
 
 ```
