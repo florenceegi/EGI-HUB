@@ -12,7 +12,9 @@ interface AiFeaturePricing {
   feature_description: string | null;
   feature_category: string;
   bundle_type: string | null;
+  /** @deprecated Non visualizzato — usare egili_gift per il premio all'acquisto */
   cost_egili: number;
+  egili_gift: number | null;
   cost_fiat_eur: string | null;
   is_active: boolean;
   is_free: boolean;
@@ -63,8 +65,8 @@ export default function FeaturePricing() {
 
   // Edit inline
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editValues, setEditValues] = useState<{ cost_egili: string; cost_fiat_eur: string; ai_tokens_included: string; ai_tokens_bonus_percentage: string }>({
-    cost_egili: '',
+  const [editValues, setEditValues] = useState<{ egili_gift: string; cost_fiat_eur: string; ai_tokens_included: string; ai_tokens_bonus_percentage: string }>({
+    egili_gift: '',
     cost_fiat_eur: '',
     ai_tokens_included: '',
     ai_tokens_bonus_percentage: '0',
@@ -97,8 +99,8 @@ export default function FeaturePricing() {
 
   // === MUTATION: update prezzi ===
   const updateMutation = useMutation({
-    mutationFn: ({ id, cost_egili, cost_fiat_eur, ai_tokens_included, ai_tokens_bonus_percentage }: { id: number; cost_egili: number; cost_fiat_eur: number | null; ai_tokens_included: number | null; ai_tokens_bonus_percentage: number }) =>
-      api.put('/superadmin/platform/pricing/' + id, { cost_egili, cost_fiat_eur, ai_tokens_included, ai_tokens_bonus_percentage }),
+    mutationFn: ({ id, egili_gift, cost_fiat_eur, ai_tokens_included, ai_tokens_bonus_percentage }: { id: number; egili_gift: number | null; cost_fiat_eur: number | null; ai_tokens_included: number | null; ai_tokens_bonus_percentage: number }) =>
+      api.put('/superadmin/platform/pricing/' + id, { egili_gift, cost_fiat_eur, ai_tokens_included, ai_tokens_bonus_percentage }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['platform-pricing'] });
       setEditingId(null);
@@ -129,7 +131,7 @@ export default function FeaturePricing() {
   const startEdit = (item: AiFeaturePricing) => {
     setEditingId(item.id);
     setEditValues({
-      cost_egili: String(item.cost_egili ?? 0),
+      egili_gift: item.egili_gift != null ? String(item.egili_gift) : '',
       cost_fiat_eur: item.cost_fiat_eur ?? '',
       ai_tokens_included: item.ai_tokens_included != null ? String(item.ai_tokens_included) : '',
       ai_tokens_bonus_percentage: String(item.ai_tokens_bonus_percentage ?? 0),
@@ -139,13 +141,13 @@ export default function FeaturePricing() {
   const cancelEdit = () => setEditingId(null);
 
   const saveEdit = (id: number) => {
-    const egili = parseInt(editValues.cost_egili, 10);
+    const gift = editValues.egili_gift !== '' ? parseInt(editValues.egili_gift, 10) : null;
     const eur = editValues.cost_fiat_eur !== '' ? parseFloat(editValues.cost_fiat_eur) : null;
     const tokens = editValues.ai_tokens_included !== '' ? parseInt(editValues.ai_tokens_included, 10) : null;
     const bonus = parseInt(editValues.ai_tokens_bonus_percentage, 10);
-    if (isNaN(egili) || egili < 0) return;
+    if (gift !== null && (isNaN(gift) || gift < 0)) return;
     if (tokens !== null && isNaN(tokens)) return;
-    updateMutation.mutate({ id, cost_egili: egili, cost_fiat_eur: eur, ai_tokens_included: tokens, ai_tokens_bonus_percentage: isNaN(bonus) ? 0 : bonus });
+    updateMutation.mutate({ id, egili_gift: gift, cost_fiat_eur: eur, ai_tokens_included: tokens, ai_tokens_bonus_percentage: isNaN(bonus) ? 0 : bonus });
   };
 
   const openDetail = (item: AiFeaturePricing) => {
@@ -268,7 +270,7 @@ export default function FeaturePricing() {
                   <th>Categoria</th>
                   <th>AI Token</th>
                   <th>Bonus %</th>
-                  <th>Egili costo</th>
+                  <th>Premio Egili</th>
                   <th>EUR</th>
                   <th>Attivo</th>
                   <th>Acquisti</th>
@@ -337,19 +339,21 @@ export default function FeaturePricing() {
                       )}
                     </td>
 
-                    {/* Egili costo — edit inline */}
+                    {/* Premio Egili — edit inline */}
                     <td>
                       {editingId === item.id ? (
                         <input
                           type="number"
                           min="0"
                           className="w-24 input input-bordered input-xs"
-                          value={editValues.cost_egili}
-                          onChange={e => setEditValues(v => ({ ...v, cost_egili: e.target.value }))}
+                          aria-label="Premio Egili"
+                          value={editValues.egili_gift}
+                          placeholder="—"
+                          onChange={e => setEditValues(v => ({ ...v, egili_gift: e.target.value }))}
                         />
                       ) : (
                         <span className="font-semibold text-yellow-600">
-                          {item.cost_egili ?? '—'}
+                          {item.egili_gift != null ? item.egili_gift.toLocaleString('it-IT') : '—'}
                         </span>
                       )}
                     </td>
