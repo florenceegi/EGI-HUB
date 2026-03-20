@@ -12,7 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, setRequires2fa } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +30,7 @@ export default function Login() {
 
       // Gestione 2FA: se richiesta vai alla challenge, altrimenti dashboard
       if (response.data.requires_2fa) {
+        setRequires2fa(true);
         navigate('/2fa-challenge');
       } else {
         navigate('/');

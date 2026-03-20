@@ -12,9 +12,11 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  requires2fa: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
   updateUser: (user: User) => void;
+  setRequires2fa: (v: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,6 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [requires2fa, setRequires2fa] = useState(false);
 
   // Inizializza lo stato dal localStorage
   useEffect(() => {
@@ -80,9 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // Ignora errori durante logout
     }
-    
+
     setUser(null);
     setToken(null);
+    setRequires2fa(false);
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
   };
@@ -99,9 +103,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token,
         isAuthenticated: !!user && !!token,
         isLoading,
+        requires2fa,
         login,
         logout,
         updateUser,
+        setRequires2fa,
       }}
     >
       {children}

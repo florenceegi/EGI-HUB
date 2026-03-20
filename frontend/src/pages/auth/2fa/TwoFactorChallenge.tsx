@@ -14,7 +14,7 @@ import { ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function TwoFactorChallenge() {
   const navigate = useNavigate();
-  const { updateUser } = useAuth();
+  const { updateUser, setRequires2fa } = useAuth();
   
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(true);
@@ -62,6 +62,8 @@ export default function TwoFactorChallenge() {
       } catch {
         // getMe fallisce raramente qui, ma non blocchiamo il flusso
       }
+
+      setRequires2fa(false);
 
       // Naviga alla dashboard principale
       navigate('/', { replace: true });

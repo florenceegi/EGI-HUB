@@ -94,8 +94,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 // Public Route (redirects to dashboard if already logged in)
 function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
-  
+  const { isAuthenticated, isLoading, requires2fa } = useAuth();
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -103,11 +103,14 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
       </div>
     );
   }
-  
+
   if (isAuthenticated) {
+    if (requires2fa) {
+      return <Navigate to="/2fa-challenge" replace />;
+    }
     return <Navigate to="/" replace />;
   }
-  
+
   return <>{children}</>;
 }
 
