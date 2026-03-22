@@ -154,6 +154,7 @@ class FeaturePricingController extends Controller {
             'admin_notes'                   => 'sometimes|nullable|string',
             'ai_tokens_included'            => 'sometimes|nullable|integer|min:0',
             'ai_tokens_bonus_percentage'    => 'sometimes|integer|min:0|max:100',
+            'egili_gift'                    => 'sometimes|nullable|integer|min:0',
         ]);
 
         try {

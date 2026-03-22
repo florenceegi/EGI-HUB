@@ -66,6 +66,7 @@ class AiFeaturePricing extends Model {
         'admin_notes',
         'ai_tokens_included',
         'ai_tokens_bonus_percentage',
+        'egili_gift',
     ];
 
     protected $casts = [
