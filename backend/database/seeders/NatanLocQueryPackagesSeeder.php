@@ -10,50 +10,54 @@ use Illuminate\Support\Facades\DB;
 /**
  * @package Database\Seeders
  * @author Padmin D. Curtis (AI Partner OS3.0) for Fabio Cherici
- * @version 2.2.0 (FlorenceEGI - NATAN LOC Query Packages)
- * @date 2026-03-20
- * @purpose Inserisce i pacchetti Token AI per NATAN_LOC nella tabella ai_feature_pricing.
+ * @version 3.0.0 (FlorenceEGI - NATAN LOC Query Packages)
+ * @date 2026-03-21
+ * @purpose Inserisce i pacchetti Token AI per NATAN_LOC (versione citizen) nella tabella ai_feature_pricing.
  *
- *          SEMANTICA MiCA-SAFE (v2.2.0):
- *          ai_tokens_included (colonna)     = Token AI — SSOT del prodotto user-facing
- *          egili_gift (colonna)             = Egili regalati all'acquisto — SSOT del premio Egili
- *          feature_parameters               = solo metadati display: approx_queries, token_unit, platform
+ *          ECONOMIA EGILI — MECCANISMO MARGINE (v3.0.0):
  *
- *          egili_gift sostituisce il calcolo runtime: ai_tokens_included × egili_credit_ratio.
- *          Il ratio in platform_settings rimane come check di sicurezza interno al Service.
+ *          Tasso deduzione: 0,0125 Egili per token consumato
+ *          → tokens_per_egili = 1 / 0,0125 = 80
  *
- *          ESEMPIO: NATAN Token 1.000 → utente compra 1000 Token AI → riceve 800 Egili (da egili_gift)
+ *          Il margine piattaforma è incorporato nel regalo (ratio 0,8):
+ *          - Egili "pieni" per 1M token: 1.000.000 × 0,0125 = 12.500 Egili
+ *          - Egili effettivamente regalati: 12.500 × 0,8 = 10.000 Egili
+ *          - Token coperti dagli Egili: 10.000 / 0,0125 = 800.000 token
+ *          - Token residui (margine): 200.000 = 20% di 1M → non consumati dall'API
  *
- *          Query stimate su Egili ricevuti (÷ 70 Egili/query media NATAN):
- *          1000 Token AI →   800 Egili → ~11 query
- *          2500 Token AI →  2000 Egili → ~28 query
- *          6250 Token AI →  5000 Egili → ~71 query
- *          12500 Token AI → 10000 Egili → ~142 query
+ *          Formula egili_gift = (ai_tokens_included × 0,0125) × 0,8
+ *          Query stimate = floor(egili_gift / 296)   [296 = egili_per_query reale, media 5 campioni]
  *
  *          PREZZI non impostati — is_active=false — attivare via EGI-HUB Superadmin dopo pricing.
+ *          Riferimento prezzo: costo API Claude puro × 1,15 buffer provider.
+ *          Mini ~€4,44 | Standard ~€13,33 | Plus ~€33,33 | Maxi ~€66,65
  */
 class NatanLocQueryPackagesSeeder extends Seeder
 {
     public function run(): void
     {
-        // Rimuovi i vecchi record con feature_code obsoleti (v1.0.0 usava valori errati)
+        // Rimuovi tutti i record NATAN LOC precedenti (v1, v2)
         DB::table('ai_feature_pricing')->whereIn('feature_code', [
             'natan_loc_token_800',
             'natan_loc_token_2000',
             'natan_loc_token_5000',
             'natan_loc_token_10000',
+            'natan_loc_token_1000',
+            'natan_loc_token_2500',
+            'natan_loc_token_6250',
+            'natan_loc_token_12500',
         ])->delete();
 
         $packages = [
             [
-                'feature_code'        => 'natan_loc_token_1000',
-                'feature_name'        => 'NATAN Token 1.000',
-                'feature_description' => 'Pacchetto 1.000 Token AI per NATAN LOC — ideale per uso occasionale. Consente circa 11 query tipiche al sistema documentale AI.',
+                'feature_code'        => 'natan_loc_mini',
+                'feature_name'        => 'NATAN Mini',
+                'feature_description' => 'Pacchetto per uso occasionale. Circa 33 risposte AI ai tuoi documenti della Pubblica Amministrazione.',
                 'feature_category'    => 'natan_loc',
-                'ai_tokens_included'  => 1000,   // SSOT Token AI
-                'egili_gift'          => 800,    // SSOT Egili regalo — letto dalla logica acquisto
-                'cost_fiat_eur'       => null,   // ⚠️ DA IMPOSTARE via EGI-HUB Superadmin
-                'cost_egili'          => 0,      // Acquistato con EUR, non con Egili
+                'ai_tokens_included'  => 1000000,    // 1M Token LLM — SSOT prodotto
+                'egili_gift'          => 10000,      // 1M × 0,0125 × 0,8 = 10.000 Egili
+                'cost_fiat_eur'       => null,        // ⚠️ DA IMPOSTARE via EGI-HUB Superadmin (~€4,44)
+                'cost_egili'          => 0,
                 'is_free'             => false,
                 'free_monthly_limit'  => 0,
                 'is_bundle'           => true,
@@ -63,33 +67,36 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'recurrence_period'   => 'one_time',
                 'expires'             => false,
                 'stackable'           => true,
-                'is_active'           => false,  // ⚠️ Attivare SOLO dopo aver impostato il prezzo
+                'is_active'           => false,       // ⚠️ Attivare dopo aver impostato il prezzo
                 'is_featured'         => false,
                 'display_order'       => 100,
                 'feature_parameters'  => json_encode([
-                    'approx_queries'  => 11,     // stima: 800 Egili ÷ 70 Egili/query
-                    'token_unit'      => 'Token AI',
-                    'platform'        => 'natan_loc',
+                    'approx_queries' => 33,           // floor(10.000 / 296)
+                    'token_unit'     => 'Token LLM',
+                    'platform'       => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
-                    '1.000 Token AI — 800 Egili accreditati al wallet',
-                    'Utilizzo su tutte le funzioni AI di NATAN',
+                    'Circa 33 risposte AI ai documenti PA',
+                    'Accesso immediato dopo l\'acquisto',
                     'Pagamento sicuro Stripe',
-                    'Token non scadono',
+                    'Non scadono',
                 ]),
                 'metadata' => json_encode([
-                    'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.2.0',
+                    'created_by'       => 'NatanLocQueryPackagesSeeder',
+                    'version'          => '3.0.0',
+                    'egili_rate'       => 0.0125,
+                    'egili_ratio'      => 0.8,
+                    'tokens_per_egili' => 80,
                 ]),
             ],
             [
-                'feature_code'        => 'natan_loc_token_2500',
-                'feature_name'        => 'NATAN Token 2.500',
-                'feature_description' => 'Pacchetto 2.500 Token AI per NATAN LOC — uso regolare. Consente circa 28 query tipiche al sistema documentale AI.',
+                'feature_code'        => 'natan_loc_standard',
+                'feature_name'        => 'NATAN Standard',
+                'feature_description' => 'Pacchetto per uso regolare. Circa 101 risposte AI ai tuoi documenti della Pubblica Amministrazione.',
                 'feature_category'    => 'natan_loc',
-                'ai_tokens_included'  => 2500,
-                'egili_gift'          => 2000,   // SSOT Egili regalo
-                'cost_fiat_eur'       => null,
+                'ai_tokens_included'  => 3000000,    // 3M Token LLM
+                'egili_gift'          => 30000,      // 3M × 0,0125 × 0,8 = 30.000 Egili
+                'cost_fiat_eur'       => null,        // ⚠️ DA IMPOSTARE (~€13,33)
                 'cost_egili'          => 0,
                 'is_free'             => false,
                 'free_monthly_limit'  => 0,
@@ -101,33 +108,36 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'expires'             => false,
                 'stackable'           => true,
                 'is_active'           => false,
-                'is_featured'         => true,   // Scelta consigliata
+                'is_featured'         => true,        // Scelta consigliata
                 'display_order'       => 110,
                 'feature_parameters'  => json_encode([
-                    'approx_queries'  => 28,     // stima: 2000 Egili ÷ 70 Egili/query
-                    'token_unit'      => 'Token AI',
-                    'platform'        => 'natan_loc',
+                    'approx_queries' => 101,          // floor(30.000 / 296)
+                    'token_unit'     => 'Token LLM',
+                    'platform'       => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
-                    '2.500 Token AI — 2.000 Egili accreditati al wallet',
-                    'Utilizzo su tutte le funzioni AI di NATAN',
+                    'Circa 101 risposte AI ai documenti PA',
+                    'Accesso immediato dopo l\'acquisto',
                     'Pagamento sicuro Stripe',
-                    'Token non scadono',
+                    'Non scadono',
                     'Scelta più popolare',
                 ]),
                 'metadata' => json_encode([
-                    'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.2.0',
+                    'created_by'       => 'NatanLocQueryPackagesSeeder',
+                    'version'          => '3.0.0',
+                    'egili_rate'       => 0.0125,
+                    'egili_ratio'      => 0.8,
+                    'tokens_per_egili' => 80,
                 ]),
             ],
             [
-                'feature_code'        => 'natan_loc_token_6250',
-                'feature_name'        => 'NATAN Token 6.250',
-                'feature_description' => 'Pacchetto 6.250 Token AI per NATAN LOC — uso intensivo. Consente circa 71 query tipiche al sistema documentale AI.',
+                'feature_code'        => 'natan_loc_plus',
+                'feature_name'        => 'NATAN Plus',
+                'feature_description' => 'Pacchetto per uso frequente. Circa 253 risposte AI ai tuoi documenti della Pubblica Amministrazione.',
                 'feature_category'    => 'natan_loc',
-                'ai_tokens_included'  => 6250,
-                'egili_gift'          => 5000,   // SSOT Egili regalo
-                'cost_fiat_eur'       => null,
+                'ai_tokens_included'  => 7500000,    // 7,5M Token LLM
+                'egili_gift'          => 75000,      // 7,5M × 0,0125 × 0,8 = 75.000 Egili
+                'cost_fiat_eur'       => null,        // ⚠️ DA IMPOSTARE (~€33,33)
                 'cost_egili'          => 0,
                 'is_free'             => false,
                 'free_monthly_limit'  => 0,
@@ -142,30 +152,33 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'is_featured'         => false,
                 'display_order'       => 120,
                 'feature_parameters'  => json_encode([
-                    'approx_queries'  => 71,     // stima: 5000 Egili ÷ 70 Egili/query
-                    'token_unit'      => 'Token AI',
-                    'platform'        => 'natan_loc',
+                    'approx_queries' => 253,          // floor(75.000 / 296)
+                    'token_unit'     => 'Token LLM',
+                    'platform'       => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
-                    '6.250 Token AI — 5.000 Egili accreditati al wallet',
-                    'Utilizzo su tutte le funzioni AI di NATAN',
+                    'Circa 253 risposte AI ai documenti PA',
+                    'Accesso immediato dopo l\'acquisto',
                     'Pagamento sicuro Stripe',
-                    'Token non scadono',
-                    'Ideale per team e uffici',
+                    'Non scadono',
+                    'Ideale per uso continuativo',
                 ]),
                 'metadata' => json_encode([
-                    'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.2.0',
+                    'created_by'       => 'NatanLocQueryPackagesSeeder',
+                    'version'          => '3.0.0',
+                    'egili_rate'       => 0.0125,
+                    'egili_ratio'      => 0.8,
+                    'tokens_per_egili' => 80,
                 ]),
             ],
             [
-                'feature_code'        => 'natan_loc_token_12500',
-                'feature_name'        => 'NATAN Token 12.500',
-                'feature_description' => 'Pacchetto 12.500 Token AI per NATAN LOC — uso enterprise. Consente circa 142 query tipiche al sistema documentale AI.',
+                'feature_code'        => 'natan_loc_maxi',
+                'feature_name'        => 'NATAN Maxi',
+                'feature_description' => 'Pacchetto per uso intensivo. Circa 506 risposte AI ai tuoi documenti della Pubblica Amministrazione.',
                 'feature_category'    => 'natan_loc',
-                'ai_tokens_included'  => 12500,
-                'egili_gift'          => 10000,  // SSOT Egili regalo
-                'cost_fiat_eur'       => null,
+                'ai_tokens_included'  => 15000000,   // 15M Token LLM
+                'egili_gift'          => 150000,     // 15M × 0,0125 × 0,8 = 150.000 Egili
+                'cost_fiat_eur'       => null,        // ⚠️ DA IMPOSTARE (~€66,65)
                 'cost_egili'          => 0,
                 'is_free'             => false,
                 'free_monthly_limit'  => 0,
@@ -180,39 +193,57 @@ class NatanLocQueryPackagesSeeder extends Seeder
                 'is_featured'         => false,
                 'display_order'       => 130,
                 'feature_parameters'  => json_encode([
-                    'approx_queries'  => 142,    // stima: 10000 Egili ÷ 70 Egili/query
-                    'token_unit'      => 'Token AI',
-                    'platform'        => 'natan_loc',
+                    'approx_queries' => 506,          // floor(150.000 / 296)
+                    'token_unit'     => 'Token LLM',
+                    'platform'       => 'natan_loc',
                 ]),
                 'benefits' => json_encode([
-                    '12.500 Token AI — 10.000 Egili accreditati al wallet',
-                    'Utilizzo su tutte le funzioni AI di NATAN',
+                    'Circa 506 risposte AI ai documenti PA',
+                    'Accesso immediato dopo l\'acquisto',
                     'Pagamento sicuro Stripe',
-                    'Token non scadono',
-                    'Per Pubbliche Amministrazioni e grandi team',
-                    'Priorità supporto',
+                    'Non scadono',
+                    'Per uso intensivo e continuativo',
                 ]),
                 'metadata' => json_encode([
-                    'created_by' => 'NatanLocQueryPackagesSeeder',
-                    'version'    => '2.2.0',
+                    'created_by'       => 'NatanLocQueryPackagesSeeder',
+                    'version'          => '3.0.0',
+                    'egili_rate'       => 0.0125,
+                    'egili_ratio'      => 0.8,
+                    'tokens_per_egili' => 80,
                 ]),
             ],
         ];
 
         foreach ($packages as $package) {
-            DB::table('ai_feature_pricing')->updateOrInsert(
-                ['feature_code' => $package['feature_code']],
-                array_merge($package, [
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ])
+            $data = array_merge($package, [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Upsert su feature_code (evita conflitti su ID sequence)
+            $columns     = array_keys($data);
+            $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+            $colList      = implode(', ', array_map(fn($c) => '"' . $c . '"', $columns));
+            $updateCols   = implode(', ', array_map(
+                fn($c) => '"' . $c . '" = EXCLUDED."' . $c . '"',
+                array_filter($columns, fn($c) => $c !== 'feature_code' && $c !== 'created_at')
+            ));
+
+            DB::statement(
+                "INSERT INTO ai_feature_pricing ({$colList}) VALUES ({$placeholders})
+                 ON CONFLICT (feature_code) DO UPDATE SET {$updateCols}",
+                array_values($data)
             );
         }
 
-        $this->command->info('NatanLoc query packages seeded v2.2.0 (4 packages, is_active=false)');
-        $this->command->info('  SSOT Token AI:     colonna ai_tokens_included');
-        $this->command->info('  SSOT Egili regalo: colonna egili_gift (scritto admin, letto dalla logica acquisto)');
-        $this->command->info('  feature_parameters: solo approx_queries, token_unit, platform (display metadata)');
+        $this->command->info('NatanLoc query packages seeded v3.0.0 (4 packages, is_active=false)');
+        $this->command->info('  Nomi: Mini / Standard / Plus / Maxi');
+        $this->command->info('  Token LLM: 1M / 3M / 7,5M / 15M');
+        $this->command->info('  Egili gift: 10.000 / 30.000 / 75.000 / 150.000');
+        $this->command->info('  Tasso deduzione: 0,0125 Egili/token (tokens_per_egili=80)');
+        $this->command->info('  Margine: 20% token non consumati (ratio regalo 0,8)');
+        $this->command->info('  Query stimate: ~33 / ~101 / ~253 / ~506');
         $this->command->warn('  Imposta i prezzi (cost_fiat_eur) e attiva (is_active=true) via EGI-HUB Superadmin');
+        $this->command->warn('  Riferimento: Mini ~€4,44 | Standard ~€13,33 | Plus ~€33,33 | Maxi ~€66,65');
     }
 }
