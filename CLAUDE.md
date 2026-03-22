@@ -107,8 +107,11 @@ SSOT Ecosistema: `/home/fabio/EGI-DOC/docs/ecosistema/`
 ## 🔒 Valori Immutabili — MAI toccare senza approvazione esplicita di Fabio
 
 ```
-tokens_per_egili  = 1250   # Token LLM per singolo Egili (ecosistema)
-egili_per_query   = 44     # Egili consumati per query standard
+tokens_per_egili  = 80     # 1/0,0125 — tasso deduzione 0,0125 Egili/token [v3.0.0 — 2026-03-21]
+egili_per_query   = 296    # media reale NATAN_LOC: 23.609 token × 0,0125 → ceil [v3.0.0 — 2026-03-21]
+# MECCANISMO MARGINE: ratio regalo 0,8 → utente riceve 80% Egili "pieni" → esaurisce
+# i token il 20% prima → quei token non vengono mai consumati dall'API = margine piattaforma.
+# Prezzo EUR = costo API puro. ZERO markup monetario. Vedi egili_payment_system.md v3.1.0.
 ```
 
 ---
